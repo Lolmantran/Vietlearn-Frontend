@@ -19,56 +19,62 @@ A modern Chinese learning web application built with Next.js, designed for Engli
 
 ```
 mandarinmind/
-├── app/                    # Next.js App Router pages
-│   ├── layout.tsx
-│   ├── page.tsx
-│   └── providers.tsx      # React Query & other providers
-├── components/
-│   ├── ui/               # Base UI components
-│   │   ├── Button.tsx
-│   │   ├── Card.tsx
-│   │   ├── Badge.tsx
-│   │   └── ProgressBar.tsx
-│   ├── flashcard/        # Flashcard components
-│   │   ├── Flashcard.tsx
-│   │   └── FlashcardSession.tsx
-│   ├── quiz/             # Quiz components
-│   │   ├── QuizQuestionCard.tsx
-│   │   └── QuizSession.tsx
-│   ├── progress/         # Progress tracking components
-│   │   ├── StreakDisplay.tsx
-│   │   ├── LevelProgress.tsx
-│   │   └── AchievementCard.tsx
-│   └── layout/           # Layout components
-│       └── Sidebar.tsx
-├── lib/
-│   ├── api/              # API client & endpoints
-│   │   ├── client.ts
+├── src/
+│   ├── app/                    # Next.js App Router pages
+│   │   ├── layout.tsx
+│   │   ├── page.tsx
+│   │   └── providers.tsx      # React Query & other providers
+│   ├── components/
+│   │   ├── ui/               # Base UI components
+│   │   │   ├── Button.tsx
+│   │   │   ├── Card.tsx
+│   │   │   ├── Badge.tsx
+│   │   │   └── ProgressBar.tsx
+│   │   ├── flashcard/        # Flashcard components
+│   │   │   ├── Flashcard.tsx
+│   │   │   └── FlashcardSession.tsx
+│   │   ├── quiz/             # Quiz components
+│   │   │   ├── QuizQuestionCard.tsx
+│   │   │   └── QuizSession.tsx
+│   │   ├── progress/         # Progress tracking components
+│   │   │   ├── StreakDisplay.tsx
+│   │   │   ├── LevelProgress.tsx
+│   │   │   └── AchievementCard.tsx
+│   │   └── layout/           # Layout components
+│   │       └── Sidebar.tsx
+│   ├── lib/
+│   │   ├── api/              # API client & endpoints
+│   │   │   ├── client.ts
+│   │   │   ├── vocabulary.ts
+│   │   │   ├── user.ts
+│   │   │   ├── quiz.ts
+│   │   │   └── review.ts
+│   │   ├── srs/              # Spaced Repetition System
+│   │   │   └── algorithm.ts
+│   │   └── utils/            # Utility functions
+│   │       ├── cn.ts         # Class name utilities
+│   │       ├── audio.ts      # Audio playback
+│   │       └── format.ts     # Formatting helpers
+│   ├── hooks/                # Custom React hooks
+│   │   ├── useVocabulary.ts
+│   │   ├── useUser.ts
+│   │   └── useReviews.ts
+│   ├── store/                # Zustand state management
+│   │   ├── userStore.ts
+│   │   ├── learningStore.ts
+│   │   └── uiStore.ts
+│   ├── types/                # TypeScript type definitions
 │   │   ├── vocabulary.ts
 │   │   ├── user.ts
 │   │   ├── quiz.ts
-│   │   └── review.ts
-│   ├── srs/              # Spaced Repetition System
-│   │   └── algorithm.ts
-│   └── utils/            # Utility functions
-│       ├── cn.ts         # Class name utilities
-│       ├── audio.ts      # Audio playback
-│       └── format.ts     # Formatting helpers
-├── hooks/                # Custom React hooks
-│   ├── useVocabulary.ts
-│   ├── useUser.ts
-│   └── useReviews.ts
-├── store/                # Zustand state management
-│   ├── userStore.ts
-│   ├── learningStore.ts
-│   └── uiStore.ts
-├── types/                # TypeScript type definitions
-│   ├── vocabulary.ts
-│   ├── user.ts
-│   ├── quiz.ts
-│   └── api.ts
-└── constants/            # App constants
-    └── index.ts          # HSK levels, XP rewards, etc.
+│   │   └── api.ts
+│   └── constants/            # App constants
+│       └── index.ts          # HSK levels, XP rewards, etc.
+├── public/                   # Static assets
+├── package.json
+├── tsconfig.json
+├── next.config.ts
+└── tailwind.config.ts
 ```
 
 ## 🎯 Core Features
