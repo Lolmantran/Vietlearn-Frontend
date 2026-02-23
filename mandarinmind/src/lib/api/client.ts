@@ -1,8 +1,8 @@
 import type { ApiError } from "@/types";
 
 // Set NEXT_PUBLIC_API_BASE_URL in your .env.local
-// e.g. NEXT_PUBLIC_API_BASE_URL=http://localhost:3001
-export const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+// e.g. NEXT_PUBLIC_API_BASE_URL=http://localhost:3001/api
+export const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000/api";
 
 function getToken(): string | null {
   if (typeof window === "undefined") return null;
@@ -54,9 +54,6 @@ async function request<T>(endpoint: string, options: FetchOptions = {}): Promise
 
   if (res.status === 401) {
     clearToken();
-    if (typeof window !== "undefined") {
-      window.location.href = "/auth/login";
-    }
     throw new ApiClientError("Unauthorised", 401);
   }
 
@@ -72,7 +69,10 @@ async function request<T>(endpoint: string, options: FetchOptions = {}): Promise
 
   // Handle 204 or empty body
   const text = await res.text();
-  return text ? (JSON.parse(text) as T) : ({} as T);
+  if (!text) return {} as T;
+  const json = JSON.parse(text);
+  // Unwrap backend envelope: { data: ... }
+  return (json !== null && typeof json === "object" && "data" in json ? json.data : json) as T;
 }
 
 export const apiClient = {

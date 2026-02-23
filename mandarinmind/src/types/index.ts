@@ -196,6 +196,7 @@ export interface TutorCorrection {
 export interface CreateSessionPayload {
   topic: string;
   mode: TutorMode;
+  level?: string;
 }
 
 // ─── Quiz ─────────────────────────────────────────────────────────────────────
@@ -206,7 +207,8 @@ export interface QuizQuestion {
   id: string;
   type: QuizQuestionType;
   prompt: string; // English prompt or Vietnamese sentence with blank
-  options?: string[]; // For multiple_choice
+  options?: string[]; // Display text for each option
+  optionIds?: string[]; // Backend IDs for each option (parallel to options[])
   audioUrl?: string; // For listening
   correctAnswer: string;
   explanation: string;

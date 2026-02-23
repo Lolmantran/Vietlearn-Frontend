@@ -34,12 +34,12 @@ export function LandingNavbar() {
         </div>
 
         <div className="hidden md:flex items-center gap-3">
-          <Link href="/auth/login">
+          <Link href="/login">
             <Button variant="ghost" size="sm" className="text-teal-100 hover:text-white hover:bg-white/10">
               Log in
             </Button>
           </Link>
-          <Link href="/auth/register">
+          <Link href="/register">
             <Button size="sm" className="bg-teal-400 text-teal-950 hover:bg-teal-300">
               Get started free
             </Button>
@@ -70,12 +70,12 @@ export function LandingNavbar() {
             </a>
           ))}
           <div className="pt-2 flex flex-col gap-2">
-            <Link href="/auth/login" onClick={() => setOpen(false)}>
+            <Link href="/login" onClick={() => setOpen(false)}>
               <Button variant="outline" size="sm" className="w-full border-teal-400 text-teal-400 hover:bg-teal-400/10">
                 Log in
               </Button>
             </Link>
-            <Link href="/auth/register" onClick={() => setOpen(false)}>
+            <Link href="/register" onClick={() => setOpen(false)}>
               <Button size="sm" className="w-full bg-teal-400 text-teal-950 hover:bg-teal-300">
                 Get started free
               </Button>

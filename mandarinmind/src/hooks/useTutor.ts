@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { tutorApi } from "@/lib/api/tutorApi";
-import { TutorSocketClient } from "@/lib/ws/tutorSocket";
 import type { TutorSession, TutorMessage, TutorMode } from "@/types";
 
 export function useTutorSessions() {
@@ -39,21 +38,23 @@ export function useTutorSessions() {
   return { sessions, isLoading, refresh, createSession, deleteSession };
 }
 
+// _userId and _apiBaseUrl are kept for API compatibility but REST needs neither
 export function useTutorChat(
   sessionId: string | null,
-  userId: string,
-  apiBaseUrl: string
+  _userId?: string,
+  _apiBaseUrl?: string
 ) {
   const [messages, setMessages] = useState<TutorMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
-  const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const socketRef = useRef<TutorSocketClient | null>(null);
 
-  // Load history when sessionId changes
+  // Load history whenever the active session changes
   useEffect(() => {
-    if (!sessionId) return;
+    if (!sessionId) {
+      setMessages([]);
+      return;
+    }
     setIsLoading(true);
     tutorApi
       .getSessionHistory(sessionId)
@@ -62,54 +63,36 @@ export function useTutorChat(
       .finally(() => setIsLoading(false));
   }, [sessionId]);
 
-  // Manage WebSocket
-  useEffect(() => {
-    if (!sessionId) return;
+  const sendMessage = useCallback(
+    async (text: string) => {
+      if (!sessionId) return;
 
-    const client = new TutorSocketClient({
-      sessionId,
-      userId,
-      apiBaseUrl,
-      onConnect: () => setIsConnected(true),
-      onDisconnect: () => setIsConnected(false),
-      onTyping: (typing) => setIsTyping(typing),
-      onError: (err) => setError(err),
-      onMessage: (payload) => {
+      // Optimistically add the user message immediately
+      const optimisticUser: TutorMessage = {
+        id: `user-${Date.now()}`,
+        role: "user",
+        text,
+        timestamp: new Date().toISOString(),
+      };
+      setMessages((prev) => [...prev, optimisticUser]);
+      setIsTyping(true);
+      setError(null);
+
+      try {
+        const { assistantMessage } = await tutorApi.sendMessage(sessionId, text);
+        setMessages((prev) => [...prev, assistantMessage]);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : "Failed to send message";
+        setError(msg);
+      } finally {
         setIsTyping(false);
-        const msg: TutorMessage = {
-          id: `ai-${Date.now()}`,
-          role: "assistant",
-          text: payload.text,
-          corrections: payload.corrections,
-          suggestions: payload.suggestions,
-          timestamp: new Date().toISOString(),
-        };
-        setMessages((prev) => [...prev, msg]);
-      },
-    });
+      }
+    },
+    [sessionId]
+  );
 
-    socketRef.current = client;
-    client.connect();
-
-    return () => {
-      client.disconnect();
-      socketRef.current = null;
-    };
-  }, [sessionId, userId, apiBaseUrl]);
-
-  const sendMessage = useCallback((text: string) => {
-    if (!socketRef.current) return;
-    const msg: TutorMessage = {
-      id: `user-${Date.now()}`,
-      role: "user",
-      text,
-      timestamp: new Date().toISOString(),
-    };
-    setMessages((prev) => [...prev, msg]);
-    setIsTyping(true);
-    setError(null);
-    socketRef.current.sendMessage(text);
-  }, []);
+  // REST is always "connected" when a session is active
+  const isConnected = !!sessionId;
 
   return { messages, isLoading, isTyping, isConnected, error, sendMessage };
 }

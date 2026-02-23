@@ -15,7 +15,7 @@ const PLANS = [
       "Daily quiz",
     ],
     cta: "Start for free",
-    href: "/auth/register",
+    href: "/register",
     highlight: false,
   },
   {
@@ -32,7 +32,7 @@ const PLANS = [
       "Detailed progress analytics",
     ],
     cta: "Start free trial",
-    href: "/auth/register",
+    href: "/register",
     highlight: true,
   },
   {
@@ -47,7 +47,7 @@ const PLANS = [
       "Early access to new features",
     ],
     cta: "Buy lifetime access",
-    href: "/auth/register",
+    href: "/register",
     highlight: false,
   },
 ];

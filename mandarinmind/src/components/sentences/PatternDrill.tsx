@@ -149,6 +149,44 @@ function FillBlankTask({ task, onResult }: { task: PatternDrillTask; onResult: (
   );
 }
 
+function TranslateTask({ task, onResult }: { task: PatternDrillTask; onResult: (correct: boolean) => void }) {
+  const [answer, setAnswer] = useState("");
+  const [checked, setChecked] = useState<boolean | null>(null);
+
+  const checkAnswer = () => {
+    const correct = task.referenceSentence.toLowerCase().trim() === answer.toLowerCase().trim();
+    setChecked(correct);
+    onResult(correct);
+  };
+
+  return (
+    <div>
+      <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">Translate to Vietnamese</p>
+      <p className="text-base font-medium text-slate-800 mb-4">{task.instruction}</p>
+      <input
+        type="text"
+        value={answer}
+        onChange={(e) => setAnswer(e.target.value)}
+        disabled={checked !== null}
+        placeholder="Type your Vietnamese translation…"
+        onKeyDown={(e) => e.key === "Enter" && answer.trim() && checkAnswer()}
+        className="w-full rounded-xl border-2 border-slate-200 px-3 py-2 text-sm focus:outline-none focus:border-teal-500 mb-4"
+      />
+      {checked === null ? (
+        <Button size="sm" onClick={checkAnswer} disabled={!answer.trim()}>Check</Button>
+      ) : (
+        <div className={cn("flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium",
+          checked ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-red-50 text-red-700 border border-red-200"
+        )}>
+          {checked ? <Check size={16} /> : <X size={16} />}
+          {checked ? "Correct!" : `Answer: ${task.referenceSentence}`}
+          {task.explanation && <span className="ml-2 text-slate-500">— {task.explanation}</span>}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function PatternDrill() {
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
   const [tasks, setTasks] = useState<PatternDrillTask[]>([]);
@@ -241,6 +279,9 @@ export function PatternDrill() {
           )}
           {current.type === "fill_blank" && (
             <FillBlankTask task={current} onResult={handleResult} />
+          )}
+          {current.type === "translate" && (
+            <TranslateTask task={current} onResult={handleResult} />
           )}
           <div className="mt-6 flex justify-end">
             <Button size="sm" variant="ghost" onClick={handleNext}>

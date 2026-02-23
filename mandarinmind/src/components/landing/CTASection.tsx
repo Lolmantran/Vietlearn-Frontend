@@ -15,7 +15,7 @@ export function CTASection() {
           Start your first lesson in under 2 minutes — for free.
         </p>
         <div className="mt-8">
-          <Link href="/auth/register">
+          <Link href="/register">
             <Button
               size="lg"
               className="bg-teal-400 text-teal-950 hover:bg-teal-300 font-bold shadow-xl"

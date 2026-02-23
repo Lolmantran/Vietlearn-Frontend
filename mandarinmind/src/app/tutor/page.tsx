@@ -8,24 +8,15 @@ import { SessionList } from "@/components/tutor/SessionList";
 import { ModeSelector } from "@/components/tutor/ModeSelector";
 import { ChatWindow } from "@/components/tutor/ChatWindow";
 import { useTutorSessions, useTutorChat } from "@/hooks/useTutor";
-import { useAuth } from "@/hooks/useAuth";
 import type { TutorMode } from "@/types";
 
 export default function TutorPage() {
-  const { user } = useAuth();
   const { sessions, isLoading, createSession, deleteSession } = useTutorSessions();
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const [mode, setMode] = useState<TutorMode>("just_chat");
   const [showModeModal, setShowModeModal] = useState(false);
 
-  const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-  const userId = user?.id ?? "";
-
-  const { messages, isTyping, isConnected, sendMessage } = useTutorChat(
-    activeSessionId,
-    userId,
-    apiBase
-  );
+  const { messages, isTyping, isConnected, sendMessage } = useTutorChat(activeSessionId);
 
   const handleNewSession = async () => {
     try {

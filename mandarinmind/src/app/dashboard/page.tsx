@@ -124,29 +124,29 @@ export default function DashboardPage() {
           : [
               {
                 label: "Day streak",
-                value: `${data.streakDays} 🔥`,
+                value: `${data?.streakDays ?? 0} 🔥`,
                 sub: "Keep it going!",
                 icon: <Flame size={18} />,
                 colorClass: "bg-amber-50 text-amber-500",
               },
               {
                 label: "Words learned",
-                value: data.totalWordsLearned.toLocaleString(),
+                value: (data?.totalWordsLearned ?? 0).toLocaleString(),
                 sub: "Total vocabulary",
                 icon: <BookOpen size={18} />,
                 colorClass: "bg-teal-50 text-teal-600",
               },
               {
                 label: "Due today",
-                value: data.wordsDueToday,
+                value: data?.wordsDueToday ?? 0,
                 sub: "Review queue",
                 icon: <Calendar size={18} />,
                 colorClass: "bg-violet-50 text-violet-600",
               },
               {
                 label: "XP today",
-                value: `${data.xpToday} ⭐`,
-                sub: `${data.xpTotal.toLocaleString()} total`,
+                value: `${data?.xpToday ?? 0} ⭐`,
+                sub: `${(data?.xpTotal ?? 0).toLocaleString()} total`,
                 icon: <Target size={18} />,
                 colorClass: "bg-emerald-50 text-emerald-600",
               },
@@ -177,7 +177,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Recommended action */}
-          {!isLoading && (
+          {!isLoading && data?.nextRecommendedAction && (
             <div className="mt-4 rounded-2xl bg-gradient-to-br from-teal-600 to-teal-700 p-5 text-white">
               <p className="text-xs font-semibold uppercase tracking-widest text-teal-200 mb-1">
                 Recommended next
@@ -203,12 +203,12 @@ export default function DashboardPage() {
           <div className="rounded-2xl border border-slate-200 bg-white p-5">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-semibold text-slate-700">Weekly activity</h3>
-              <span className="text-xs text-slate-400">{data.minutesStudiedToday} min today</span>
+              <span className="text-xs text-slate-400">{data?.minutesStudiedToday ?? 0} min today</span>
             </div>
             {isLoading ? (
               <Skeleton className="h-20 w-full" />
             ) : (
-              <WeeklyActivity activity={data.weeklyActivity} />
+              <WeeklyActivity activity={data?.weeklyActivity ?? []} />
             )}
           </div>
 
@@ -216,15 +216,15 @@ export default function DashboardPage() {
           <div className="rounded-2xl border border-slate-200 bg-white p-5">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-semibold text-slate-700">Daily goal</h3>
-              <Badge variant={data.minutesStudiedToday >= (user?.dailyGoalMinutes ?? 10) ? "success" : "default"}>
-                {data.minutesStudiedToday >= (user?.dailyGoalMinutes ?? 10) ? "Complete ✓" : "In progress"}
+              <Badge variant={(data?.minutesStudiedToday ?? 0) >= (user?.dailyGoalMinutes ?? 10) ? "success" : "default"}>
+                {(data?.minutesStudiedToday ?? 0) >= (user?.dailyGoalMinutes ?? 10) ? "Complete ✓" : "In progress"}
               </Badge>
             </div>
             <Progress
-              value={data.minutesStudiedToday}
+              value={data?.minutesStudiedToday ?? 0}
               max={user?.dailyGoalMinutes ?? 10}
               color="teal"
-              label={`${data.minutesStudiedToday} / ${user?.dailyGoalMinutes ?? 10} min`}
+              label={`${data?.minutesStudiedToday ?? 0} / ${user?.dailyGoalMinutes ?? 10} min`}
               showLabel
             />
           </div>

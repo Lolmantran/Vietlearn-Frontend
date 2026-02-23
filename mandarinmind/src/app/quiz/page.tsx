@@ -63,7 +63,7 @@ const MOCK_QUIZ: DailyQuiz = {
 };
 
 export default function QuizPage() {
-  const { quiz: apiQuiz, isLoading, result: apiResult, currentIndex, totalQuestions, answerQuestion, goToNext, submit, isSubmitting } = useQuiz();
+  const { quiz: apiQuiz, isLoading, error: quizError, result: apiResult, currentIndex, totalQuestions, answers, answerQuestion, goToNext, submit, isSubmitting } = useQuiz();
 
   // Use API quiz or mock fallback
   const quiz = apiQuiz ?? MOCK_QUIZ;
@@ -79,6 +79,10 @@ export default function QuizPage() {
   const total = quiz.questions.length;
   const result = isUsingMock ? mockResult : apiResult;
   const current = quiz.questions[idx];
+  // For the real API path, read selected answer from the hook's answers array
+  const currentSelectedAnswer = isUsingMock
+    ? (localAnswers[idx] || null)
+    : (answers[idx]?.userAnswer || null);
 
   const handleAnswer = (answer: string) => {
     if (isUsingMock) {
@@ -119,7 +123,11 @@ export default function QuizPage() {
         timeSpentSeconds: 0,
       });
     } else {
-      await submit();
+      try {
+        await submit();
+      } catch {
+        // error is stored in quizError state from the hook
+      }
     }
   };
 
@@ -165,7 +173,7 @@ export default function QuizPage() {
         {current.type === "multiple_choice" && (
           <MultipleChoice
             question={current}
-            selected={localAnswers[idx] || null}
+            selected={currentSelectedAnswer}
             revealed={isRevealed}
             onSelect={(a) => handleAnswer(a)}
           />
@@ -175,7 +183,7 @@ export default function QuizPage() {
             question={current}
             onSubmit={(a) => handleAnswer(a)}
             revealed={isRevealed}
-            submitted={localAnswers[idx] || null}
+            submitted={currentSelectedAnswer}
           />
         )}
         {current.type === "listening" && (
@@ -183,23 +191,30 @@ export default function QuizPage() {
             question={current}
             onSubmit={(a) => handleAnswer(a)}
             revealed={isRevealed}
-            submitted={localAnswers[idx] || null}
+            submitted={currentSelectedAnswer}
           />
         )}
       </div>
 
       {/* Navigation */}
       {isRevealed && (
-        <div className="flex gap-3">
-          {isLast ? (
-            <Button onClick={handleSubmit} isLoading={isSubmitting}>
-              Finish quiz →
-            </Button>
-          ) : (
-            <Button onClick={handleNext} rightIcon={<ArrowRight size={16} />}>
-              Next question
-            </Button>
+        <div className="space-y-3">
+          {quizError && !isUsingMock && (
+            <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-2 text-sm text-red-600">
+              {quizError} — please try again.
+            </div>
           )}
+          <div className="flex gap-3">
+            {isLast ? (
+              <Button onClick={handleSubmit} isLoading={isSubmitting}>
+                Finish quiz →
+              </Button>
+            ) : (
+              <Button onClick={handleNext} rightIcon={<ArrowRight size={16} />}>
+                Next question
+              </Button>
+            )}
+          </div>
         </div>
       )}
     </AppLayout>

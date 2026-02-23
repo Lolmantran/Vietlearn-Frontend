@@ -43,11 +43,11 @@ export function FeedbackPanel({ result, userSentence, reference }: FeedbackPanel
       </div>
 
       {/* Corrections */}
-      {result.corrections.length > 0 && (
+      {(result.corrections?.length ?? 0) > 0 && (
         <div className="rounded-2xl border border-amber-100 bg-amber-50 p-4">
           <p className="text-xs font-semibold text-amber-600 uppercase tracking-wide mb-3">Corrections</p>
           <div className="space-y-3">
-            {result.corrections.map((c, i) => (
+            {result.corrections?.map((c, i) => (
               <div key={i} className="flex gap-3 text-sm">
                 <span className="shrink-0 rounded-lg bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700 capitalize h-fit mt-0.5">
                   {c.type}
@@ -64,11 +64,11 @@ export function FeedbackPanel({ result, userSentence, reference }: FeedbackPanel
       )}
 
       {/* Natural alternatives */}
-      {result.naturalAlternatives.length > 0 && (
+      {(result.naturalAlternatives?.length ?? 0) > 0 && (
         <div className="rounded-2xl border border-teal-100 bg-teal-50 p-4">
           <p className="text-xs font-semibold text-teal-600 uppercase tracking-wide mb-2">Natural alternatives</p>
           <ul className="space-y-1">
-            {result.naturalAlternatives.map((alt, i) => (
+            {result.naturalAlternatives?.map((alt, i) => (
               <li key={i} className="text-sm text-teal-700 font-medium">• {alt}</li>
             ))}
           </ul>

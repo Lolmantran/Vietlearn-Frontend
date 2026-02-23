@@ -23,7 +23,7 @@ export function GeneratedLessonView({ lesson, onAddVocabToDeck }: GeneratedLesso
       {/* Header */}
       <div className="rounded-2xl bg-gradient-to-br from-teal-600 to-teal-700 text-white p-6">
         <div className="flex items-center gap-2 mb-2">
-          <Badge variant="info" className="capitalize text-xs">{lesson.level.replace("_", " ")}</Badge>
+          <Badge variant="info" className="capitalize text-xs">{lesson.level?.replace("_", " ")}</Badge>
           <Badge variant="default" className="text-xs">{lesson.topic}</Badge>
         </div>
         <h2 className="text-xl font-bold mb-1">{lesson.title}</h2>
@@ -78,6 +78,7 @@ export function GeneratedLessonView({ lesson, onAddVocabToDeck }: GeneratedLesso
       </div>
 
       {/* Dialogue */}
+      {lesson.dialogue.length > 0 && (
       <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden">
         <button
           className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-slate-50 transition-colors"
@@ -118,6 +119,7 @@ export function GeneratedLessonView({ lesson, onAddVocabToDeck }: GeneratedLesso
           </div>
         )}
       </div>
+      )}
 
       {/* Practice tasks */}
       <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden">

@@ -1,11 +1,8 @@
-import { API_BASE } from "@/lib/api/client";
 import type {
   WsConnectionOptions,
   WsAssistantMessagePayload,
   WsTokenStreamPayload,
 } from "./types";
-
-const WS_BASE = API_BASE.replace(/^http/, "ws");
 
 const MAX_RETRIES = 5;
 const BASE_DELAY_MS = 1000;
@@ -42,8 +39,10 @@ export class TutorSocketClient {
   }
 
   private _openConnection(): void {
-    const { sessionId, userId } = this.options;
-    const url = `${WS_BASE}/tutor?sessionId=${encodeURIComponent(sessionId)}&userId=${encodeURIComponent(userId)}`;
+    const { sessionId, userId, apiBaseUrl } = this.options;
+    // Strip /api suffix to get the raw base, then convert http→ws
+    const wsBase = apiBaseUrl.replace(/\/api$/, "").replace(/^http/, "ws");
+    const url = `${wsBase}/tutor?sessionId=${encodeURIComponent(sessionId)}&userId=${encodeURIComponent(userId)}`;
 
     this.ws = new WebSocket(url);
 

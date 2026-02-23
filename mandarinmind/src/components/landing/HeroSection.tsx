@@ -54,12 +54,12 @@ export function HeroSection() {
         </p>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-          <Link href="/auth/register">
+          <Link href="/register">
             <Button size="lg" className="bg-teal-400 text-teal-950 hover:bg-teal-300 font-bold shadow-xl shadow-teal-900/40" rightIcon={<ArrowRight size={18} />}>
               Start learning for free
             </Button>
           </Link>
-          <Link href="/auth/login">
+          <Link href="/login">
             <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10">
               Continue learning
             </Button>
