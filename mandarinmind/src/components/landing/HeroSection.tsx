@@ -12,7 +12,7 @@ const FLOATING_WORDS = [
 
 export function HeroSection() {
   return (
-    <section className="relative min-h-screen bg-gradient-to-br from-teal-950 via-teal-900 to-slate-900 flex items-center overflow-hidden">
+    <section className="relative min-h-screen bg-linear-to-br from-teal-950 via-teal-900 to-slate-900 flex items-center overflow-hidden">
       {/* Background decorative Vietnamese phrases */}
       <div className="absolute inset-0 pointer-events-none select-none overflow-hidden">
         {FLOATING_WORDS.map((w, i) => (
@@ -30,7 +30,7 @@ export function HeroSection() {
           </span>
         ))}
         {/* Large watermark */}
-        <div className="absolute -bottom-8 -right-8 text-white/[0.04] text-[200px] font-black select-none">
+        <div className="absolute -bottom-8 -right-8 text-white/4 text-[200px] font-black select-none">
           Việt
         </div>
       </div>

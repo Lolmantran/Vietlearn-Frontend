@@ -4,7 +4,7 @@ import { ArrowRight } from "lucide-react";
 
 export function CTASection() {
   return (
-    <section className="py-24 bg-gradient-to-br from-teal-900 via-teal-800 to-slate-900">
+    <section className="py-24 bg-linear-to-br from-teal-900 via-teal-800 to-slate-900">
       <div className="mx-auto max-w-2xl px-6 text-center">
         <h2 className="text-4xl font-black text-white leading-tight">
           Ready to say{" "}

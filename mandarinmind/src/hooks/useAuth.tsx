@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, createContext, useContext } from "rea
 import type { ReactNode } from "react";
 import { authApi } from "@/lib/api/authApi";
 import { clearToken, setToken } from "@/lib/api/client";
-import type { User, AuthCredentials, RegisterPayload } from "@/types";
+import type { User, AuthCredentials, RegisterPayload, UpdateMePayload } from "@/types";
 
 interface AuthContextValue {
   user: User | null;
@@ -14,6 +14,7 @@ interface AuthContextValue {
   register: (payload: RegisterPayload) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
+  updateUser: (payload: UpdateMePayload) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -53,8 +54,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }, []);
 
+  const updateUser = useCallback(async (payload: UpdateMePayload) => {
+    const updated = await authApi.updateMe(payload);
+    setUser(updated);
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, isAuthenticated: !!user, login, register, logout, refreshUser }}>
+    <AuthContext.Provider value={{ user, isLoading, isAuthenticated: !!user, login, register, logout, refreshUser, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

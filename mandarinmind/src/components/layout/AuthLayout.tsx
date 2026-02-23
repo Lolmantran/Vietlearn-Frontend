@@ -7,7 +7,7 @@ interface AuthLayoutProps {
 
 export function AuthLayout({ children }: AuthLayoutProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-900 via-teal-800 to-slate-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-linear-to-br from-teal-900 via-teal-800 to-slate-900 flex items-center justify-center p-4">
       <div className="absolute inset-0 overflow-hidden pointer-events-none select-none opacity-10">
         {["chào", "học", "tiếng", "việt", "xin", "cảm", "ơn", "tôi"].map((word, i) => (
           <span

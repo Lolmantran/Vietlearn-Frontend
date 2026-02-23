@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { vocabApi } from "@/lib/api/vocabApi";
-import type { VocabCard, Deck, DeckType, SRSRating } from "@/types";
+import type { VocabCard, Deck, SRSRating } from "@/types";
 
 export function useReviewQueue() {
   const [cards, setCards] = useState<VocabCard[]>([]);
@@ -50,7 +50,8 @@ export function useDecks() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const refresh = useCallback(() => {
+    setIsLoading(true);
     vocabApi
       .getDecks()
       .then(setDecks)
@@ -58,23 +59,56 @@ export function useDecks() {
       .finally(() => setIsLoading(false));
   }, []);
 
-  return { decks, isLoading, error };
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
+  const enrollDeck = useCallback(
+    async (deckId: string) => {
+      const result = await vocabApi.enrollDeck(deckId);
+      // Update enrolledCount on the matching deck
+      setDecks((prev) =>
+        prev.map((d) =>
+          d.id === deckId
+            ? { ...d, learnedCount: result.enrolled, enrolledCount: result.enrolled }
+            : d
+        )
+      );
+      return result;
+    },
+    []
+  );
+
+  const addDeck = useCallback((deck: import("@/types").Deck) => {
+    setDecks((prev) => [deck, ...prev]);
+  }, []);
+
+  const replaceDeck = useCallback((tempId: string, deck: import("@/types").Deck) => {
+    setDecks((prev) => prev.map((d) => d.id === tempId ? deck : d));
+  }, []);
+
+  const removeDeck = useCallback((id: string) => {
+    setDecks((prev) => prev.filter((d) => d.id !== id));
+  }, []);
+
+  return { decks, isLoading, error, refresh, enrollDeck, addDeck, replaceDeck, removeDeck };
 }
 
-export function useDeckCards(deckType: DeckType, deckId?: string) {
+export function useDeckCards(deckId: string | null) {
   const [cards, setCards] = useState<VocabCard[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(() => {
+    if (!deckId) return;
     setIsLoading(true);
     setError(null);
     vocabApi
-      .getDeck(deckType, deckId)
-      .then(setCards)
+      .getDeck(deckId)
+      .then(({ cards }) => setCards(cards))
       .catch((e: Error) => setError(e.message))
       .finally(() => setIsLoading(false));
-  }, [deckType, deckId]);
+  }, [deckId]);
 
   useEffect(() => {
     load();

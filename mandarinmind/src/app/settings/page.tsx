@@ -1,15 +1,16 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { User, Target, Bell, Shield, ChevronRight } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils/cn";
 import type { VietnameseLevel, LearningGoal } from "@/types";
+
+type SectionId = "profile" | "goals" | "notifications" | "account";
 
 const LEVELS: { value: VietnameseLevel; label: string }[] = [
   { value: "absolute_beginner", label: "Absolute Beginner" },
@@ -39,10 +40,11 @@ const SECTIONS = [
 ];
 
 export default function SettingsPage() {
-  const { user, refreshUser } = useAuth();
-  const [activeSection, setActiveSection] = useState("profile");
+  const { user, updateUser } = useAuth();
+  const [activeSection, setActiveSection] = useState<SectionId>("profile");
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   // Profile form state
   const [name, setName] = useState(user?.name ?? "");
@@ -52,6 +54,16 @@ export default function SettingsPage() {
   const [selectedLevel, setSelectedLevel] = useState<VietnameseLevel>(user?.level ?? "beginner");
   const [selectedGoals, setSelectedGoals] = useState<LearningGoal[]>(user?.goals ?? []);
   const [dailyGoal, setDailyGoal] = useState(user?.dailyGoalMinutes ?? 10);
+
+  // Sync form state when user data loads (async)
+  useEffect(() => {
+    if (!user) return;
+    setName(user.name);
+    setEmail(user.email);
+    setSelectedLevel(user.level);
+    setSelectedGoals(user.goals ?? []);
+    setDailyGoal(user.dailyGoalMinutes ?? 10);
+  }, [user?.id]);
 
   // Reminder state
   const [reminderEnabled, setReminderEnabled] = useState(true);
@@ -64,10 +76,23 @@ export default function SettingsPage() {
   const handleSave = async (e: FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
-    await new Promise((r) => setTimeout(r, 700)); // Mock save delay
-    setIsSaving(false);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    setSaveError(null);
+    try {
+      if (activeSection === "goals") {
+        await updateUser({
+          level: selectedLevel,
+          goals: selectedGoals,
+          dailyGoal,
+        });
+      }
+      // profile / notifications sections — extend here as backend adds support
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : "Failed to save");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -81,7 +106,7 @@ export default function SettingsPage() {
               return (
                 <button
                   key={s.id}
-                  onClick={() => setActiveSection(s.id)}
+                  onClick={() => setActiveSection(s.id as SectionId)}
                   className={cn(
                     "w-full flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium transition-all",
                     activeSection === s.id
@@ -133,11 +158,13 @@ export default function SettingsPage() {
                   <Button type="submit" isLoading={isSaving}>
                     {saved ? "✓ Saved!" : "Save changes"}
                   </Button>
+                  {saveError && <p className="text-sm text-red-500 mt-1">{saveError}</p>}
                 </form>
               </CardContent>
             </Card>
           )}
 
+          {/* ── Learning goals ── */}
           {activeSection === "goals" && (
             <Card>
               <CardHeader>
@@ -220,6 +247,7 @@ export default function SettingsPage() {
                   <Button type="submit" isLoading={isSaving}>
                     {saved ? "✓ Saved!" : "Save goals"}
                   </Button>
+                  {saveError && <p className="text-sm text-red-500 mt-1">{saveError}</p>}
                 </form>
               </CardContent>
             </Card>

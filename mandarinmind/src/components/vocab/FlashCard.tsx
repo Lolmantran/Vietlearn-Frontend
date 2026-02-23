@@ -66,7 +66,7 @@ export function FlashCard({ card, onFlip }: FlashCardProps) {
         </div>
 
         {/* Back */}
-        <div className="backface-hidden rotate-y-180 absolute inset-0 flex flex-col items-center justify-center rounded-3xl bg-gradient-to-br from-teal-600 to-teal-700 shadow-lg p-8 text-white">
+        <div className="backface-hidden rotate-y-180 absolute inset-0 flex flex-col items-center justify-center rounded-3xl bg-linear-to-br from-teal-600 to-teal-700 shadow-lg p-8 text-white">
           <h2 className="text-4xl font-black text-center mb-1">{card.vietnamese}</h2>
           <p className="text-teal-200 text-lg font-medium">{card.toneMarks}</p>
           <p className="text-teal-100/80 text-sm mt-1">[{card.pronunciation}]</p>

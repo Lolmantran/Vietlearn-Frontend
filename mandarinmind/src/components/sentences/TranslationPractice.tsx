@@ -74,7 +74,7 @@ export function TranslationPractice() {
 
   return (
     <div className="max-w-2xl">
-      <div className="rounded-2xl bg-gradient-to-br from-teal-600 to-teal-700 p-6 text-white mb-6">
+      <div className="rounded-2xl bg-linear-to-br from-teal-600 to-teal-700 p-6 text-white mb-6">
         <p className="text-xs font-semibold uppercase tracking-widest text-teal-200 mb-2">
           Translate into Vietnamese
         </p>

@@ -121,18 +121,26 @@ function FillBlankTask({ task, onResult }: { task: PatternDrillTask; onResult: (
   return (
     <div>
       <p className="text-sm font-medium text-slate-600 mb-4">{task.instruction}</p>
-      <div className="flex items-center gap-2 flex-wrap text-lg font-medium text-slate-800 mb-4">
+      <div className="flex items-center gap-2 flex-wrap text-lg font-medium text-slate-800 mb-1">
         <span>{parts[0]}</span>
-        <input
-          type="text"
-          value={answer}
-          onChange={(e) => setAnswer(e.target.value)}
-          disabled={checked !== null}
-          placeholder={task.blank?.hint ?? "…"}
-          className="rounded-lg border-2 border-teal-300 px-3 py-1 text-base w-36 focus:outline-none focus:border-teal-500"
-        />
+        <div className="flex flex-col items-start gap-0.5">
+          <input
+            type="text"
+            value={answer}
+            onChange={(e) => setAnswer(e.target.value)}
+            disabled={checked !== null}
+            placeholder="…"
+            className="rounded-lg border-2 border-teal-300 px-3 py-1 text-base w-36 focus:outline-none focus:border-teal-500 placeholder:text-slate-300"
+          />
+          {task.blank?.hint && (
+            <span className="text-xs text-teal-600 font-normal px-1">
+              ({task.blank.hint})
+            </span>
+          )}
+        </div>
         <span>{parts[1]}</span>
       </div>
+      <div className="mb-4" />
 
       {checked === null ? (
         <Button size="sm" onClick={checkAnswer} disabled={!answer.trim()}>Check</Button>

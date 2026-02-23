@@ -44,7 +44,7 @@ export function HowItWorksSection() {
           {STEPS.map((s, i) => (
             <div key={i} className="relative rounded-2xl bg-white border border-slate-100 p-6 shadow-sm overflow-hidden">
               <div className={`absolute top-0 left-0 h-1 w-full bg-gradient-to-r ${s.color}`} />
-              <p className={`text-4xl font-black bg-gradient-to-br ${s.color} bg-clip-text text-transparent mb-4`}>
+              <p className={`text-4xl font-black bg-linear-to-br ${s.color} bg-clip-text text-transparent mb-4`}>
                 {s.num}
               </p>
               <h3 className="text-base font-semibold text-slate-800 mb-2">{s.title}</h3>

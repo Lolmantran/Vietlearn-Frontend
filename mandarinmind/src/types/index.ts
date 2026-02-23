@@ -63,6 +63,12 @@ export interface OnboardingGoalsPayload {
   dailyGoalMinutes: number;
 }
 
+export interface UpdateMePayload {
+  level?: VietnameseLevel;  // frontend level, converted to CEFR by authApi
+  goals?: LearningGoal[];   // frontend goal keys, converted by authApi
+  dailyGoal?: number;       // minutes
+}
+
 export interface PlacementQuestion {
   id: string;
   text: string;
@@ -100,20 +106,34 @@ export interface Deck {
   name: string;
   description: string;
   type: DeckType;
-  cardCount: number;
-  learnedCount: number;
+  cardCount: number;      // alias for totalCards
+  learnedCount: number;   // alias for enrolledCount
   coverEmoji: string;
   level: VietnameseLevel;
+  // Extra fields from backend (kept for reference)
+  isOwned?: boolean;
+  totalCards?: number;
+  enrolledCount?: number;
 }
 
 export interface ReviewPayload {
-  cardId: string;
+  cardId: string;   // sent as flashcardId to backend
   rating: SRSRating;
 }
 
 export interface ReviewResponse {
+  cardId?: string;
   nextReviewAt: string;
-  newSrsLevel: number;
+  newSrsLevel?: number;
+  interval?: number;
+  xpEarned?: number;
+}
+
+export interface EnrollResponse {
+  deckId: string;
+  enrolled: number;
+  alreadyEnrolled: number;
+  total: number;
 }
 
 export interface CustomDeckPayload {

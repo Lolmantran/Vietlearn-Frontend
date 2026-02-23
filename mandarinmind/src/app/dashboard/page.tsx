@@ -178,7 +178,7 @@ export default function DashboardPage() {
 
           {/* Recommended action */}
           {!isLoading && data?.nextRecommendedAction && (
-            <div className="mt-4 rounded-2xl bg-gradient-to-br from-teal-600 to-teal-700 p-5 text-white">
+            <div className="mt-4 rounded-2xl bg-linear-to-br from-teal-600 to-teal-700 p-5 text-white">
               <p className="text-xs font-semibold uppercase tracking-widest text-teal-200 mb-1">
                 Recommended next
               </p>

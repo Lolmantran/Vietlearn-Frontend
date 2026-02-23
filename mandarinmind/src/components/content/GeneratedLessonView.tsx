@@ -21,7 +21,7 @@ export function GeneratedLessonView({ lesson, onAddVocabToDeck }: GeneratedLesso
   return (
     <div className="max-w-2xl space-y-4">
       {/* Header */}
-      <div className="rounded-2xl bg-gradient-to-br from-teal-600 to-teal-700 text-white p-6">
+      <div className="rounded-2xl bg-linear-to-br from-teal-600 to-teal-700 text-white p-6">
         <div className="flex items-center gap-2 mb-2">
           <Badge variant="info" className="capitalize text-xs">{lesson.level?.replace("_", " ")}</Badge>
           <Badge variant="default" className="text-xs">{lesson.topic}</Badge>
