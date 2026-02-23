@@ -1,86 +1,93 @@
-import axios from "axios";
-import { ApiResponse, ApiError } from "@/types/api";
+import type { ApiError } from "@/types";
 
-// Create axios instance with default config
-export const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api",
-  timeout: 10000,
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
+// Set NEXT_PUBLIC_API_BASE_URL in your .env.local
+// e.g. NEXT_PUBLIC_API_BASE_URL=http://localhost:3001
+export const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
 
-// Request interceptor to add auth token
-apiClient.interceptors.request.use(
-  (config) => {
-    // Get token from localStorage or your auth solution
-    const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
-    
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-// Response interceptor for error handling
-apiClient.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  (error) => {
-    if (error.response) {
-      // Server responded with error status
-      const apiError: ApiError = {
-        statusCode: error.response.status,
-        message: error.response.data?.message || "An error occurred",
-        error: error.response.data?.error,
-        timestamp: new Date().toISOString(),
-      };
-      
-      // Handle specific status codes
-      if (error.response.status === 401) {
-        // Unauthorized - clear auth and redirect to login
-        if (typeof window !== "undefined") {
-          localStorage.removeItem("auth_token");
-          window.location.href = "/login";
-        }
-      }
-      
-      return Promise.reject(apiError);
-    } else if (error.request) {
-      // Request made but no response received
-      return Promise.reject({
-        statusCode: 0,
-        message: "No response from server",
-        timestamp: new Date().toISOString(),
-      });
-    } else {
-      // Something else happened
-      return Promise.reject({
-        statusCode: 0,
-        message: error.message || "Request failed",
-        timestamp: new Date().toISOString(),
-      });
-    }
-  }
-);
-
-/**
- * Helper function to handle API responses
- */
-export async function handleApiResponse<T>(
-  promise: Promise<{ data: ApiResponse<T> }>
-): Promise<T> {
-  const response = await promise;
-  
-  if (response.data.success && response.data.data) {
-    return response.data.data;
-  }
-  
-  throw new Error(response.data.error || "API request failed");
+function getToken(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem("viet_access_token");
 }
+
+export function setToken(token: string): void {
+  if (typeof window === "undefined") return;
+  localStorage.setItem("viet_access_token", token);
+}
+
+export function clearToken(): void {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem("viet_access_token");
+}
+
+interface FetchOptions extends RequestInit {
+  params?: Record<string, string | number | boolean>;
+}
+
+export class ApiClientError extends Error {
+  statusCode: number;
+  constructor(message: string, statusCode: number) {
+    super(message);
+    this.statusCode = statusCode;
+    this.name = "ApiClientError";
+  }
+}
+
+async function request<T>(endpoint: string, options: FetchOptions = {}): Promise<T> {
+  const { params, headers: extraHeaders, ...rest } = options;
+
+  let url = `${API_BASE}${endpoint}`;
+  if (params) {
+    const qs = new URLSearchParams(
+      Object.fromEntries(Object.entries(params).map(([k, v]) => [k, String(v)]))
+    ).toString();
+    url += `?${qs}`;
+  }
+
+  const token = getToken();
+  const headers: HeadersInit = {
+    "Content-Type": "application/json",
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...extraHeaders,
+  };
+
+  const res = await fetch(url, { ...rest, headers });
+
+  if (res.status === 401) {
+    clearToken();
+    if (typeof window !== "undefined") {
+      window.location.href = "/auth/login";
+    }
+    throw new ApiClientError("Unauthorised", 401);
+  }
+
+  if (!res.ok) {
+    let errBody: ApiError = { message: "Unknown error", statusCode: res.status };
+    try {
+      errBody = await res.json();
+    } catch {
+      // ignore parse error
+    }
+    throw new ApiClientError(errBody.message ?? "Request failed", res.status);
+  }
+
+  // Handle 204 or empty body
+  const text = await res.text();
+  return text ? (JSON.parse(text) as T) : ({} as T);
+}
+
+export const apiClient = {
+  get: <T>(endpoint: string, params?: Record<string, string | number | boolean>) =>
+    request<T>(endpoint, { method: "GET", params }),
+
+  post: <T>(endpoint: string, body?: unknown) =>
+    request<T>(endpoint, { method: "POST", body: JSON.stringify(body) }),
+
+  put: <T>(endpoint: string, body?: unknown) =>
+    request<T>(endpoint, { method: "PUT", body: JSON.stringify(body) }),
+
+  patch: <T>(endpoint: string, body?: unknown) =>
+    request<T>(endpoint, { method: "PATCH", body: JSON.stringify(body) }),
+
+  delete: <T>(endpoint: string) =>
+    request<T>(endpoint, { method: "DELETE" }),
+};

@@ -1,139 +1,127 @@
-"use client";
-
-import { Button } from "@/components/ui/Button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
-import { Check } from "lucide-react";
 import Link from "next/link";
+import { Check } from "lucide-react";
+import { Button } from "@/components/ui/Button";
 
-const plans = [
+const PLANS = [
   {
     name: "Free",
     price: "$0",
     period: "forever",
-    description: "Perfect for trying out MandarinMind",
+    description: "Great to get started",
     features: [
-      "HSK 1-2 vocabulary",
-      "Basic flashcards",
-      "5 reviews per day",
-      "Progress tracking",
-      "Mobile access",
+      "100 core vocabulary cards",
+      "Basic SRS reviews",
+      "5 AI tutor messages / day",
+      "Daily quiz",
     ],
-    cta: "Start Free",
-    popular: false,
+    cta: "Start for free",
+    href: "/auth/register",
+    highlight: false,
   },
   {
     name: "Pro",
-    price: "$9.99",
+    price: "$9",
     period: "per month",
-    description: "For serious learners committed to fluency",
+    description: "For serious learners",
     features: [
-      "All HSK levels (1-9)",
-      "Unlimited reviews",
-      "Advanced quizzes",
-      "Audio pronunciation",
-      "Custom word packs",
-      "Detailed analytics",
-      "Priority support",
-      "Ad-free experience",
+      "Unlimited vocabulary cards",
+      "All topic decks",
+      "Unlimited AI tutor",
+      "Sentence drills & feedback",
+      "Content generator",
+      "Detailed progress analytics",
     ],
-    cta: "Start Pro Trial",
-    popular: true,
+    cta: "Start free trial",
+    href: "/auth/register",
+    highlight: true,
   },
   {
     name: "Lifetime",
-    price: "$199",
+    price: "$149",
     period: "one-time",
-    description: "Best value for long-term learners",
+    description: "Pay once, own forever",
     features: [
       "Everything in Pro",
-      "Lifetime access",
-      "All future features",
-      "Premium support",
-      "Early access to beta",
-      "No recurring fees",
+      "Lifetime updates",
+      "Priority support",
+      "Early access to new features",
     ],
-    cta: "Get Lifetime",
-    popular: false,
+    cta: "Buy lifetime access",
+    href: "/auth/register",
+    highlight: false,
   },
 ];
 
 export function PricingSection() {
   return (
     <section id="pricing" className="py-24 bg-white">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        {/* Section Header */}
+      <div className="mx-auto max-w-5xl px-6">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Simple, Transparent Pricing
-          </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Choose the plan that fits your learning goals. Start free, upgrade anytime.
+          <p className="text-sm font-semibold uppercase tracking-widest text-teal-600 mb-3">
+            Pricing
           </p>
+          <h2 className="text-4xl font-bold text-slate-900">Simple, honest pricing</h2>
+          <p className="mt-4 text-slate-500">Start free — upgrade when you&apos;re ready.</p>
         </div>
 
-        {/* Pricing Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {plans.map((plan) => (
-            <Card
+        <div className="grid gap-6 md:grid-cols-3">
+          {PLANS.map((plan) => (
+            <div
               key={plan.name}
-              variant={plan.popular ? "elevated" : "bordered"}
-              className={`relative ${
-                plan.popular ? "border-2 border-purple-500 shadow-2xl scale-105" : ""
+              className={`relative rounded-2xl p-8 flex flex-col ${
+                plan.highlight
+                  ? "bg-teal-900 text-white shadow-2xl shadow-teal-900/30 scale-105"
+                  : "bg-white border border-slate-200"
               }`}
             >
-              {plan.popular && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                  <Badge variant="info" className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-1">
-                    Most Popular
-                  </Badge>
+              {plan.highlight && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                  <span className="rounded-full bg-teal-400 px-3 py-1 text-xs font-bold text-teal-950">
+                    Most popular
+                  </span>
                 </div>
               )}
-              
-              <CardHeader className="text-center pb-8 pt-8">
-                <CardTitle className="text-2xl mb-2">{plan.name}</CardTitle>
-                <div className="space-y-2">
-                  <div className="flex items-baseline justify-center gap-2">
-                    <span className="text-5xl font-bold text-gray-900">{plan.price}</span>
-                    <span className="text-gray-500">/ {plan.period}</span>
-                  </div>
-                  <p className="text-sm text-gray-600">{plan.description}</p>
-                </div>
-              </CardHeader>
+              <p className={`text-sm font-semibold ${plan.highlight ? "text-teal-300" : "text-teal-600"}`}>
+                {plan.name}
+              </p>
+              <div className="mt-2 flex items-end gap-1">
+                <span className={`text-4xl font-black ${plan.highlight ? "text-white" : "text-slate-900"}`}>
+                  {plan.price}
+                </span>
+                <span className={`mb-1 text-sm ${plan.highlight ? "text-teal-300" : "text-slate-400"}`}>
+                  /{plan.period}
+                </span>
+              </div>
+              <p className={`mt-1 text-sm ${plan.highlight ? "text-teal-200" : "text-slate-500"}`}>
+                {plan.description}
+              </p>
 
-              <CardContent className="space-y-6">
-                <ul className="space-y-3">
-                  {plan.features.map((feature) => (
-                    <li key={feature} className="flex items-start gap-3">
-                      <Check className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                      <span className="text-gray-700">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
+              <ul className="mt-6 mb-8 flex-1 space-y-3">
+                {plan.features.map((f) => (
+                  <li key={f} className="flex items-start gap-2 text-sm">
+                    <Check
+                      size={15}
+                      className={`mt-0.5 shrink-0 ${plan.highlight ? "text-teal-400" : "text-teal-500"}`}
+                    />
+                    <span className={plan.highlight ? "text-teal-100" : "text-slate-600"}>{f}</span>
+                  </li>
+                ))}
+              </ul>
 
-                <Link href="/signup" className="block">
-                  <Button
-                    variant={plan.popular ? "primary" : "outline"}
-                    className={`w-full ${
-                      plan.popular
-                        ? "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
-                        : ""
-                    }`}
-                    size="lg"
-                  >
-                    {plan.cta}
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+              <Link href={plan.href}>
+                <Button
+                  className={`w-full ${
+                    plan.highlight
+                      ? "bg-teal-400 text-teal-950 hover:bg-teal-300"
+                      : ""
+                  }`}
+                  variant={plan.highlight ? "primary" : "outline"}
+                >
+                  {plan.cta}
+                </Button>
+              </Link>
+            </div>
           ))}
-        </div>
-
-        {/* Money-back guarantee */}
-        <div className="text-center mt-12">
-          <p className="text-gray-600">
-            All paid plans include a <strong className="text-gray-900">30-day money-back guarantee</strong>. No questions asked.
-          </p>
         </div>
       </div>
     </section>

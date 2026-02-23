@@ -1,69 +1,88 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
+"use client";
+
+import { useState, type FormEvent } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Mail, Lock } from "lucide-react";
+import { AuthLayout } from "@/components/layout/AuthLayout";
+import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/Button";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function LoginPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const { login } = useAuth();
+  const router = useRouter();
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    setError(null);
+    setIsLoading(true);
+    try {
+      await login({ email, password });
+      router.push("/dashboard");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Login failed");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 flex items-center justify-center p-6">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <div className="flex items-center justify-center mb-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-2xl">
-              漢
-            </div>
-          </div>
-          <CardTitle className="text-2xl text-center">Welcome Back!</CardTitle>
-          <p className="text-center text-gray-600 mt-2">
-            Log in to continue your learning journey
-          </p>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <label htmlFor="email" className="text-sm font-medium text-gray-700">
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              placeholder="your@email.com"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+    <AuthLayout>
+      <h2 className="text-2xl font-bold text-slate-800 mb-1">Welcome back</h2>
+      <p className="text-sm text-slate-500 mb-6">Log in to continue your Vietnamese journey</p>
 
-          <div className="space-y-2">
-            <label htmlFor="password" className="text-sm font-medium text-gray-700">
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+      {error && (
+        <div className="mb-4 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
+          {error}
+        </div>
+      )}
 
-          <div className="flex items-center justify-between text-sm">
-            <label className="flex items-center gap-2">
-              <input type="checkbox" className="rounded" />
-              <span className="text-gray-600">Remember me</span>
-            </label>
-            <a href="#" className="text-blue-600 hover:underline">
-              Forgot password?
-            </a>
-          </div>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <Input
+          label="Email"
+          type="email"
+          placeholder="you@example.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          leftElement={<Mail size={16} />}
+        />
+        <Input
+          label="Password"
+          type="password"
+          placeholder="••••••••"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          leftElement={<Lock size={16} />}
+        />
 
-          <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600" size="lg">
-            Log In
-          </Button>
+        <div className="flex items-center justify-between text-sm">
+          <label className="flex items-center gap-2 text-slate-600 cursor-pointer">
+            <input type="checkbox" className="rounded" />
+            Remember me
+          </label>
+          <a href="#" className="text-teal-600 hover:underline">
+            Forgot password?
+          </a>
+        </div>
 
-          <div className="text-center text-sm text-gray-600">
-            Don&apos;t have an account?{" "}
-            <Link href="/signup" className="text-blue-600 hover:underline font-medium">
-              Sign up
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+        <Button type="submit" className="w-full" size="lg" isLoading={isLoading}>
+          Log in
+        </Button>
+      </form>
+
+      <p className="mt-5 text-center text-sm text-slate-500">
+        Don&apos;t have an account?{" "}
+        <Link href="/auth/register" className="text-teal-600 font-medium hover:underline">
+          Sign up free
+        </Link>
+      </p>
+    </AuthLayout>
   );
 }

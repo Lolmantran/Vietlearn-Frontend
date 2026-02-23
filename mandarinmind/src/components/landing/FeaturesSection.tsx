@@ -1,95 +1,100 @@
-"use client";
+import {
+  Brain,
+  MessageSquare,
+  BarChart2,
+  Shuffle,
+  BookOpen,
+  Headphones,
+  Zap,
+  Target,
+} from "lucide-react";
 
-import { Brain, Zap, Trophy, BarChart3, Volume2, Sparkles, Clock, Target } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/Card";
-
-const features = [
+const FEATURES = [
   {
-    icon: Brain,
-    title: "Spaced Repetition System",
-    description: "Learn efficiently with our SRS algorithm that adapts to your learning pace and ensures long-term retention.",
-    color: "from-blue-500 to-cyan-500",
+    icon: <Brain className="text-teal-600" size={24} />,
+    title: "Spaced Repetition",
+    description:
+      "AI-scheduled reviews ensure you see every word right before you'd forget it — maximising retention in minimum time.",
+    bg: "bg-teal-50",
   },
   {
-    icon: Zap,
-    title: "Interactive Flashcards",
-    description: "Practice with smart flashcards that help you master Chinese characters, pinyin, and meanings.",
-    color: "from-purple-500 to-pink-500",
+    icon: <MessageSquare className="text-violet-600" size={24} />,
+    title: "AI Conversation Tutor",
+    description:
+      "Chat with an AI tutor that corrects your Vietnamese inline, explains grammar in plain English, and adapts to your level.",
+    bg: "bg-violet-50",
   },
   {
-    icon: Volume2,
-    title: "Audio Pronunciation",
-    description: "Listen to native pronunciation for every word and example sentence to perfect your speaking.",
-    color: "from-green-500 to-emerald-500",
+    icon: <Shuffle className="text-amber-600" size={24} />,
+    title: "Sentence Drills",
+    description:
+      "Reorder words, fill in blanks, and translate sentences. Instant AI feedback explains every correction.",
+    bg: "bg-amber-50",
   },
   {
-    icon: Trophy,
-    title: "Gamification & Streaks",
-    description: "Stay motivated with XP, levels, achievements, and daily streaks. Make learning addictive!",
-    color: "from-yellow-500 to-orange-500",
+    icon: <BookOpen className="text-emerald-600" size={24} />,
+    title: "Topic-based Decks",
+    description:
+      "Core vocabulary, travel, business, food, family — pre-built decks for every situation, or generate your own.",
+    bg: "bg-emerald-50",
   },
   {
-    icon: BarChart3,
+    icon: <Headphones className="text-blue-600" size={24} />,
+    title: "Listening Practice",
+    description:
+      "Hear native-speed pronunciation for every word and sentence. Train your ear alongside your reading.",
+    bg: "bg-blue-50",
+  },
+  {
+    icon: <BarChart2 className="text-rose-600" size={24} />,
     title: "Progress Tracking",
-    description: "Visualize your learning journey with detailed statistics, charts, and progress reports.",
-    color: "from-red-500 to-pink-500",
+    description:
+      "Detailed stats on streaks, words mastered, accuracy by topic — stay motivated with clear evidence of progress.",
+    bg: "bg-rose-50",
   },
   {
-    icon: Target,
-    title: "HSK Levels 1-9",
-    description: "Follow the official HSK curriculum with carefully curated word lists for each level.",
-    color: "from-indigo-500 to-purple-500",
+    icon: <Zap className="text-orange-600" size={24} />,
+    title: "Daily Smart Quiz",
+    description:
+      "A fresh mixed quiz each day combining vocab, listening, and grammar — keeps learning lively and well-rounded.",
+    bg: "bg-orange-50",
   },
   {
-    icon: Sparkles,
-    title: "Smart Quiz System",
-    description: "Test your knowledge with multiple-choice, audio, and reading quizzes tailored to your level.",
-    color: "from-teal-500 to-cyan-500",
-  },
-  {
-    icon: Clock,
-    title: "Daily Review Queue",
-    description: "Never forget what you've learned. Our smart algorithm reminds you exactly when to review.",
-    color: "from-orange-500 to-red-500",
+    icon: <Target className="text-pink-600" size={24} />,
+    title: "Learn from Your Interests",
+    description:
+      "Paste any English text or pick a topic — we generate a mini Vietnamese lesson complete with vocab and dialogues.",
+    bg: "bg-pink-50",
   },
 ];
 
 export function FeaturesSection() {
   return (
     <section id="features" className="py-24 bg-white">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        {/* Section Header */}
+      <div className="mx-auto max-w-6xl px-6">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Everything you need to master Chinese
+          <p className="text-sm font-semibold uppercase tracking-widest text-teal-600 mb-3">
+            Everything you need
+          </p>
+          <h2 className="text-4xl font-bold text-slate-900">
+            Learn smarter, not harder
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Powerful features designed to make your Chinese learning journey effective, efficient, and enjoyable.
+          <p className="mt-4 text-lg text-slate-500 max-w-xl mx-auto">
+            VietLearn packs the most effective language-learning techniques into one coherent experience.
           </p>
         </div>
 
-        {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {features.map((feature) => {
-            const Icon = feature.icon;
-            return (
-              <Card
-                key={feature.title}
-                variant="bordered"
-                className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
-              >
-                <CardContent className="p-6 space-y-4">
-                  <div
-                    className={`w-12 h-12 rounded-lg bg-gradient-to-br ${feature.color} flex items-center justify-center group-hover:scale-110 transition-transform`}
-                  >
-                    <Icon className="h-6 w-6 text-white" />
-                  </div>
-                  <h3 className="text-lg font-bold text-gray-900">{feature.title}</h3>
-                  <p className="text-gray-600 text-sm leading-relaxed">{feature.description}</p>
-                </CardContent>
-              </Card>
-            );
-          })}
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {FEATURES.map((f, i) => (
+            <div
+              key={i}
+              className="rounded-2xl border border-slate-100 bg-white p-6 transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md"
+            >
+              <div className={`mb-4 inline-flex rounded-xl p-3 ${f.bg}`}>{f.icon}</div>
+              <h3 className="mb-2 text-base font-semibold text-slate-800">{f.title}</h3>
+              <p className="text-sm text-slate-500 leading-relaxed">{f.description}</p>
+            </div>
+          ))}
         </div>
       </div>
     </section>
