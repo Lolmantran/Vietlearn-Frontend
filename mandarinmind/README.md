@@ -158,4 +158,3 @@ Every push triggers the GitHub Actions pipeline:
 2. **Lint** — `npm run lint`
 3. **Build** — `npm run build`
 
-A failing build or lint error blocks the push. Configure the following **repository secrets** in GitHub → Settings → Secrets → Actions:
