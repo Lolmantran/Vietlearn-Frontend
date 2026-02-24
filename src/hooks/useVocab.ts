@@ -12,6 +12,7 @@ export function useReviewQueue() {
   const [sessionComplete, setSessionComplete] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsLoading(true);
     vocabApi
       .getReviewQueue()
@@ -76,6 +77,7 @@ export function useDecks() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     refresh();
   }, [refresh]);
 
@@ -127,6 +129,7 @@ export function useDeckCards(deckId: string | null) {
   }, [deckId]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     load();
   }, [load]);
 

@@ -82,7 +82,7 @@ export default function SettingsPage() {
     setSelectedLevel(user.level);
     setSelectedGoals(user.goals ?? []);
     setDailyGoal(user.dailyGoalMinutes ?? 10);
-  }, [user?.id]);
+  }, [user]);
 
   // Reminder state
   const [reminderEnabled, setReminderEnabled] = useState(true);

@@ -18,6 +18,7 @@ export function useTutorSessions() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     refresh();
   }, [refresh]);
 
@@ -39,11 +40,7 @@ export function useTutorSessions() {
 }
 
 // _userId and _apiBaseUrl are kept for API compatibility but REST needs neither
-export function useTutorChat(
-  sessionId: string | null,
-  _userId?: string,
-  _apiBaseUrl?: string
-) {
+export function useTutorChat(sessionId: string | null) {
   const [messages, setMessages] = useState<TutorMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);

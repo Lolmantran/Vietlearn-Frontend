@@ -63,7 +63,7 @@ const MOCK_QUIZ: DailyQuiz = {
 };
 
 export default function QuizPage() {
-  const { quiz: apiQuiz, isLoading, error: quizError, result: apiResult, currentIndex, totalQuestions, answers, answerQuestion, goToNext, submit, isSubmitting } = useQuiz();
+  const { quiz: apiQuiz, isLoading, error: quizError, result: apiResult, currentIndex, answers, answerQuestion, goToNext, submit, isSubmitting } = useQuiz();
 
   // Use API quiz or mock fallback
   const quiz = apiQuiz ?? MOCK_QUIZ;
@@ -153,7 +153,6 @@ export default function QuizPage() {
   }
 
   const isRevealed = revealedIdx.has(idx);
-  const answered = isUsingMock ? !!localAnswers[idx] : false;
   const isLast = idx === total - 1;
 
   return (
