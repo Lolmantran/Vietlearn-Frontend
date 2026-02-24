@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, useEffect, type FormEvent, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Mail, Lock } from "lucide-react";
 import { signIn } from "next-auth/react";
 import { AuthLayout } from "@/components/layout/AuthLayout";
@@ -10,13 +10,19 @@ import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/hooks/useAuth";
 
-export default function LoginPage() {
+function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Redirect already-logged-in users away from /login
+  useEffect(() => {
+    if (isAuthenticated) router.replace("/dashboard");
+  }, [isAuthenticated, router]);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -24,7 +30,8 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       await login({ email, password });
-      router.push("/dashboard");
+      const from = searchParams.get("from");
+      router.push(from ?? "/dashboard");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Login failed");
     } finally {
@@ -33,6 +40,7 @@ export default function LoginPage() {
   }
 
   return (
+
     <AuthLayout>
       <h2 className="text-2xl font-bold text-slate-800 mb-1">Welcome back</h2>
       <p className="text-sm text-slate-500 mb-6">Log in to continue your Vietnamese journey</p>
@@ -123,5 +131,13 @@ export default function LoginPage() {
         Continue with Google
       </button>
     </AuthLayout>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
   );
 }

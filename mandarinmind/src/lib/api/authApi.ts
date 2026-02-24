@@ -1,4 +1,4 @@
-import { apiClient, setToken, clearToken } from "./client";
+import { apiClient, setToken, clearToken, getAvatarUrl } from "./client";
 import type { AuthCredentials, RegisterPayload, AuthResponse, User, UpdateMePayload, VietnameseLevel, LearningGoal } from "@/types";
 
 // ─── Level / goal normalization (backend → frontend types) ───────────────────
@@ -28,11 +28,20 @@ export function normalizeUser(raw: any): User {
   const goals: LearningGoal[] = (Array.isArray(raw?.goals) ? raw.goals : [])
     .map((g: string) => BACKEND_GOAL_MAP[g.toLowerCase()] ?? null)
     .filter(Boolean);
+
+  const name: string = raw?.name ?? "";
+  const email: string = raw?.email ?? "";
+
+  // Avatar priority: backend avatarUrl → backend picture → stored Google photo → ui-avatars
+  const storedAvatar = getAvatarUrl();
+  const uiAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(name || email)}&background=0d9488&color=fff&size=128&bold=true`;
+  const avatarUrl: string = raw?.avatarUrl ?? raw?.picture ?? storedAvatar ?? uiAvatar;
+
   return {
     id: raw?.id ?? "",
-    name: raw?.name ?? "",
-    email: raw?.email ?? "",
-    avatarUrl: raw?.avatarUrl ?? undefined,
+    name,
+    email,
+    avatarUrl,
     level,
     goals,
     dailyGoalMinutes: raw?.dailyGoal ?? raw?.dailyGoalMinutes ?? 10,

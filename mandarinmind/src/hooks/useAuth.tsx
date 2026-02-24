@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useCallback, createContext, useContext } from "react";
 import type { ReactNode } from "react";
+import { signOut } from "next-auth/react";
 import { authApi } from "@/lib/api/authApi";
-import { clearToken, setToken } from "@/lib/api/client";
+import { API_BASE, getToken, clearToken, setToken, clearAvatarUrl } from "@/lib/api/client";
 import type { User, AuthCredentials, RegisterPayload, UpdateMePayload } from "@/types";
 
 interface AuthContextValue {
@@ -12,7 +13,7 @@ interface AuthContextValue {
   isAuthenticated: boolean;
   login: (credentials: AuthCredentials) => Promise<void>;
   register: (payload: RegisterPayload) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
   updateUser: (payload: UpdateMePayload) => Promise<void>;
 }
@@ -48,10 +49,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(res.user);
   }, []);
 
-  const logout = useCallback(() => {
-    authApi.logout();
-    clearToken();
-    setUser(null);
+  const logout = useCallback(async () => {
+    const token = getToken();
+    try {
+      if (token) {
+        await fetch(`${API_BASE}/auth/logout`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      }
+    } catch {
+      // fire-and-forget — always clear local state
+    } finally {
+      clearToken();
+      clearAvatarUrl();
+      setUser(null);
+      // Clear NextAuth session for Google sign-in users
+      signOut({ redirect: false }).catch(() => {});
+    }
   }, []);
 
   const updateUser = useCallback(async (payload: UpdateMePayload) => {

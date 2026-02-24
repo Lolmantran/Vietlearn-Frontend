@@ -3,24 +3,11 @@
 import type { ReactNode } from "react";
 import { SessionProvider, useSession } from "next-auth/react";
 import { AuthProvider } from "@/hooks/useAuth";
-import { setToken } from "@/lib/api/client";
+import { setToken, setAvatarUrl } from "@/lib/api/client";
 
-/**
- * Waits for NextAuth to resolve its session check, then seeds the backend
- * access token into localStorage BEFORE AuthProvider mounts.
- *
- * This prevents the race where:
- *   AuthProvider calls GET /api/me (no token → 401 → user=null)
- *   ProtectedRoute redirects to /login
- *   ...and only THEN does useSession() fire its effect with the token.
- *
- * By blocking AuthProvider until the session is known, the very first
- * /api/me call already carries the Bearer token.
- */
 function PreTokenSeeder({ children }: { children: ReactNode }) {
   const { data: session, status } = useSession();
 
-  // Hold rendering while NextAuth is checking the session cookie
   if (status === "loading") {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -29,9 +16,12 @@ function PreTokenSeeder({ children }: { children: ReactNode }) {
     );
   }
 
-  // Synchronously seed the token so AuthProvider's first /api/me call has it
   if (status === "authenticated" && session?.accessToken) {
     setToken(session.accessToken);
+    // Seed Google profile picture so normalizeUser can pick it up
+    if (session.user?.image) {
+      setAvatarUrl(session.user.image);
+    }
   }
 
   return <AuthProvider>{children}</AuthProvider>;

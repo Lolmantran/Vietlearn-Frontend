@@ -14,9 +14,9 @@ export function TopBar({ title, onMenuClick }: TopBarProps) {
   const { user, logout } = useAuth();
   const router = useRouter();
 
-  const handleLogout = () => {
-    logout();
-    router.push("/");
+  const handleLogout = async () => {
+    await logout();
+    router.push("/login");
   };
 
   return (
@@ -46,8 +46,23 @@ export function TopBar({ title, onMenuClick }: TopBarProps) {
             onClick={() => router.push("/settings")}
             className="flex items-center gap-2 rounded-xl px-2 py-1 hover:bg-slate-100 transition-colors"
           >
-            <div className="h-8 w-8 rounded-full bg-teal-600 text-white flex items-center justify-center text-sm font-semibold">
-              {user.name.charAt(0).toUpperCase()}
+            <div className="relative h-8 w-8 shrink-0">
+              {user.avatarUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={user.avatarUrl}
+                  alt={user.name}
+                  className="h-8 w-8 rounded-full object-cover"
+                  referrerPolicy="no-referrer"
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; (e.currentTarget.nextElementSibling as HTMLElement | null)?.style.removeProperty("display"); }}
+                />
+              ) : null}
+              <div
+                className="h-8 w-8 rounded-full bg-teal-600 text-white flex items-center justify-center text-sm font-semibold"
+                style={user.avatarUrl ? { display: "none" } : {}}
+              >
+                {user.name.charAt(0).toUpperCase()}
+              </div>
             </div>
             <span className="hidden sm:block text-sm font-medium text-slate-700">{user.name}</span>
           </button>

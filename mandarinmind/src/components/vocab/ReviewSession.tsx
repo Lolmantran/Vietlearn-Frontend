@@ -282,7 +282,7 @@ export function ReviewSession() {
             rightIcon={<ArrowRight size={14} />}
             disabled={isSubmitting}
           >
-            {currentIndex + 1 >= queue.length ? "Finish" : "Next →"}
+            {currentIndex + 1 >= queue.length ? "Finish" : "Next"}
           </Button>
         </div>
       )}

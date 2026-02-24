@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, FormEvent } from "react";
-import { User, Target, Bell, Shield, ChevronRight } from "lucide-react";
+import { User, Target, Bell, Shield, ChevronRight, CreditCard, Check, Zap, Lock } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
@@ -10,7 +10,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils/cn";
 import type { VietnameseLevel, LearningGoal } from "@/types";
 
-type SectionId = "profile" | "goals" | "notifications" | "account";
+type SectionId = "profile" | "goals" | "notifications" | "account" | "billing";
 
 const LEVELS: { value: VietnameseLevel; label: string }[] = [
   { value: "absolute_beginner", label: "Absolute Beginner" },
@@ -37,6 +37,25 @@ const SECTIONS = [
   { id: "goals", label: "Learning goals", icon: Target },
   { id: "notifications", label: "Notifications", icon: Bell },
   { id: "account", label: "Account", icon: Shield },
+  { id: "billing", label: "Billing", icon: CreditCard },
+];
+
+const FREE_FEATURES = [
+  "Up to 100 vocabulary cards",
+  "10 AI tutor messages / day",
+  "Basic quiz modes",
+  "5 lessons per month",
+  "Community support",
+];
+
+const PRO_FEATURES = [
+  "Unlimited vocabulary cards",
+  "Unlimited AI tutor messages",
+  "All quiz & listening modes",
+  "Unlimited AI-generated lessons",
+  "Pronunciation feedback",
+  "Offline mode",
+  "Priority support",
 ];
 
 export default function SettingsPage() {
@@ -320,6 +339,121 @@ export default function SettingsPage() {
                 </form>
               </CardContent>
             </Card>
+          )}
+
+          {activeSection === "billing" && (
+            <div className="space-y-5">
+              {/* Trial alert */}
+              <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3.5">
+                <Zap size={18} className="mt-0.5 shrink-0 text-amber-500" />
+                <div>
+                  <p className="text-sm font-semibold text-amber-800">You&apos;re currently in trial</p>
+                  <p className="text-sm text-amber-700 mt-0.5">
+                    All Pro features are <span className="font-semibold">free and unlimited</span> during the trial period. No credit card needed — enjoy everything without restrictions.
+                  </p>
+                </div>
+              </div>
+
+              {/* Current plan banner */}
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-600 border border-slate-200">
+                          Current plan
+                        </span>
+                      </div>
+                      <h3 className="text-2xl font-bold text-slate-800 mt-2">Free</h3>
+                      <p className="text-sm text-slate-500 mt-1">You&apos;re on the free tier — no credit card required.</p>
+                    </div>
+                    <div className="shrink-0 h-12 w-12 rounded-xl bg-slate-100 flex items-center justify-center">
+                      <CreditCard size={22} className="text-slate-400" />
+                    </div>
+                  </div>
+
+                  <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                    <div className="rounded-xl bg-slate-50 p-3 text-center">
+                      <p className="text-lg font-bold text-slate-800">100</p>
+                      <p className="text-xs text-slate-500 mt-0.5">Cards limit</p>
+                    </div>
+                    <div className="rounded-xl bg-slate-50 p-3 text-center">
+                      <p className="text-lg font-bold text-slate-800">10 / day</p>
+                      <p className="text-xs text-slate-500 mt-0.5">AI messages</p>
+                    </div>
+                    <div className="rounded-xl bg-slate-50 p-3 text-center">
+                      <p className="text-lg font-bold text-slate-800">5 / mo</p>
+                      <p className="text-xs text-slate-500 mt-0.5">Lessons</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Plan comparison */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Free column */}
+                <Card>
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-base">Free</CardTitle>
+                      <span className="rounded-full bg-teal-50 border border-teal-200 px-2.5 py-0.5 text-xs font-semibold text-teal-700">Current</span>
+                    </div>
+                    <p className="text-2xl font-bold text-slate-800 mt-1">$0 <span className="text-sm font-normal text-slate-400">/ month</span></p>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2">
+                      {FREE_FEATURES.map((f) => (
+                        <li key={f} className="flex items-start gap-2 text-sm text-slate-600">
+                          <Check size={15} className="mt-0.5 shrink-0 text-teal-500" />
+                          {f}
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+
+                {/* Pro column */}
+                <Card className="border-teal-300 bg-linear-to-br from-teal-50 to-white">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-base">Pro</CardTitle>
+                      <span className="inline-flex items-center gap-1 rounded-full bg-teal-600 px-2.5 py-0.5 text-xs font-semibold text-white">
+                        <Zap size={11} /> Recommended
+                      </span>
+                    </div>
+                    <p className="text-2xl font-bold text-slate-800 mt-1">$9 <span className="text-sm font-normal text-slate-400">/ month</span></p>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2 mb-5">
+                      {PRO_FEATURES.map((f) => (
+                        <li key={f} className="flex items-start gap-2 text-sm text-slate-600">
+                          <Check size={15} className="mt-0.5 shrink-0 text-teal-500" />
+                          {f}
+                        </li>
+                      ))}
+                    </ul>
+                    <Button className="w-full" disabled>
+                      <Lock size={13} className="mr-1.5" />
+                      Coming soon
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Billing history placeholder */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Billing history</CardTitle>
+                  <CardDescription>No invoices yet — you&apos;re on the free plan.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-6 py-8 text-center">
+                    <CreditCard size={28} className="mx-auto text-slate-300 mb-2" />
+                    <p className="text-sm text-slate-400">Invoices will appear here once you upgrade.</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           )}
 
           {activeSection === "account" && (
