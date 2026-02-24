@@ -1,10 +1,11 @@
 import type { ApiError } from "@/types";
+import Cookies from "js-cookie";
 
 // Set NEXT_PUBLIC_API_BASE_URL in your .env.local
 // e.g. NEXT_PUBLIC_API_BASE_URL=http://localhost:3001/api
 export const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000/api";
 
-function getToken(): string | null {
+export function getToken(): string | null {
   if (typeof window === "undefined") return null;
   return localStorage.getItem("viet_access_token");
 }
@@ -12,11 +13,33 @@ function getToken(): string | null {
 export function setToken(token: string): void {
   if (typeof window === "undefined") return;
   localStorage.setItem("viet_access_token", token);
+  // Also persist in a cookie so Next.js middleware can read it
+  Cookies.set("accessToken", token, {
+    expires: 7,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+  });
 }
 
 export function clearToken(): void {
   if (typeof window === "undefined") return;
   localStorage.removeItem("viet_access_token");
+  Cookies.remove("accessToken");
+}
+
+export function setAvatarUrl(url: string): void {
+  if (typeof window === "undefined") return;
+  localStorage.setItem("viet_avatar_url", url);
+}
+
+export function getAvatarUrl(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem("viet_avatar_url");
+}
+
+export function clearAvatarUrl(): void {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem("viet_avatar_url");
 }
 
 interface FetchOptions extends RequestInit {

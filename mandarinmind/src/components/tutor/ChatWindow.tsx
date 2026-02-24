@@ -26,9 +26,9 @@ export function ChatWindow({
   const [draft, setDraft] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  // Scroll to bottom on new messages
+  // Scroll to bottom on new messages; use 'instant' when loading history
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    bottomRef.current?.scrollIntoView({ behavior: messages.length > 1 ? "auto" : "smooth" });
   }, [messages, isTyping]);
 
   const handleSubmit = (e: FormEvent) => {

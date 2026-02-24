@@ -317,7 +317,7 @@ export default function OnboardingPage() {
   const currentMeta = STEP_META[step];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-950 via-teal-900 to-slate-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-linear-to-br from-teal-950 via-teal-900 to-slate-900 flex items-center justify-center p-4">
       <div className="w-full max-w-lg">
         {/* Stepper header */}
         <div className="mb-6 text-center">

@@ -1,15 +1,20 @@
 import type { VietnameseLevel, LearningGoal } from "@/types";
 
-export function formatLevel(level: VietnameseLevel): string {
-  const labels: Record<VietnameseLevel, string> = {
+export function formatLevel(level: VietnameseLevel | string | null | undefined): string {
+  const labels: Record<string, string> = {
     absolute_beginner: "Absolute Beginner",
     beginner: "Beginner",
     elementary: "Elementary",
     intermediate: "Intermediate",
     upper_intermediate: "Upper Intermediate",
     advanced: "Advanced",
+    // CEFR fallbacks in case normalization hasn't run yet
+    a1: "Beginner", a2: "Elementary",
+    b1: "Intermediate", b2: "Upper Intermediate",
+    c1: "Advanced", c2: "Advanced",
   };
-  return labels[level];
+  if (!level) return "Beginner";
+  return labels[level.toString().toLowerCase()] ?? level.toString();
 }
 
 export function formatGoal(goal: LearningGoal): string {

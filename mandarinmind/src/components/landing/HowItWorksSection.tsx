@@ -31,20 +31,20 @@ const STEPS = [
 
 export function HowItWorksSection() {
   return (
-    <section id="how-it-works" className="py-24 bg-slate-50">
-      <div className="mx-auto max-w-6xl px-6">
-        <div className="text-center mb-16">
+    <section id="how-it-works" className="py-16 md:py-24 bg-slate-50">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="text-center mb-12 md:mb-16">
           <p className="text-sm font-semibold uppercase tracking-widest text-teal-600 mb-3">
             Simple process
           </p>
-          <h2 className="text-4xl font-bold text-slate-900">How VietLearn works</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-900">How VietLearn works</h2>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {STEPS.map((s, i) => (
             <div key={i} className="relative rounded-2xl bg-white border border-slate-100 p-6 shadow-sm overflow-hidden">
               <div className={`absolute top-0 left-0 h-1 w-full bg-gradient-to-r ${s.color}`} />
-              <p className={`text-4xl font-black bg-gradient-to-br ${s.color} bg-clip-text text-transparent mb-4`}>
+              <p className={`text-4xl font-black bg-linear-to-br ${s.color} bg-clip-text text-transparent mb-4`}>
                 {s.num}
               </p>
               <h3 className="text-base font-semibold text-slate-800 mb-2">{s.title}</h3>

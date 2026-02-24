@@ -54,23 +54,23 @@ const PLANS = [
 
 export function PricingSection() {
   return (
-    <section id="pricing" className="py-24 bg-white">
-      <div className="mx-auto max-w-5xl px-6">
-        <div className="text-center mb-16">
+    <section id="pricing" className="py-16 md:py-24 bg-white">
+      <div className="mx-auto max-w-5xl px-4 sm:px-6">
+        <div className="text-center mb-12 md:mb-16">
           <p className="text-sm font-semibold uppercase tracking-widest text-teal-600 mb-3">
             Pricing
           </p>
-          <h2 className="text-4xl font-bold text-slate-900">Simple, honest pricing</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-900">Simple, honest pricing</h2>
           <p className="mt-4 text-slate-500">Start free — upgrade when you&apos;re ready.</p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-3 items-start">
           {PLANS.map((plan) => (
             <div
               key={plan.name}
-              className={`relative rounded-2xl p-8 flex flex-col ${
+              className={`relative rounded-2xl p-6 md:p-8 flex flex-col ${
                 plan.highlight
-                  ? "bg-teal-900 text-white shadow-2xl shadow-teal-900/30 scale-105"
+                  ? "bg-teal-900 text-white shadow-2xl shadow-teal-900/30 md:scale-105"
                   : "bg-white border border-slate-200"
               }`}
             >

@@ -12,7 +12,7 @@ const FLOATING_WORDS = [
 
 export function HeroSection() {
   return (
-    <section className="relative min-h-screen bg-gradient-to-br from-teal-950 via-teal-900 to-slate-900 flex items-center overflow-hidden">
+    <section className="relative min-h-screen bg-linear-to-br from-teal-950 via-teal-900 to-slate-900 flex items-center overflow-hidden">
       {/* Background decorative Vietnamese phrases */}
       <div className="absolute inset-0 pointer-events-none select-none overflow-hidden">
         {FLOATING_WORDS.map((w, i) => (
@@ -30,25 +30,25 @@ export function HeroSection() {
           </span>
         ))}
         {/* Large watermark */}
-        <div className="absolute -bottom-8 -right-8 text-white/[0.04] text-[200px] font-black select-none">
+        <div className="absolute -bottom-8 -right-8 text-white/4 text-[200px] font-black select-none">
           Việt
         </div>
       </div>
 
-      <div className="relative mx-auto max-w-6xl px-6 py-24 text-center">
+      <div className="relative mx-auto max-w-6xl px-4 sm:px-6 py-16 sm:py-20 md:py-28 text-center">
         {/* Badge */}
         <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-teal-500/30 bg-teal-500/10 px-4 py-1.5 text-sm text-teal-300">
           <Sparkles size={14} />
           AI-powered · Spaced repetition · Free to start
         </div>
 
-        <h1 className="text-5xl md:text-7xl font-black text-white leading-tight tracking-tight">
+        <h1 className="text-4xl sm:text-5xl md:text-7xl font-black text-white leading-tight tracking-tight">
           Speak Vietnamese
           <br />
           <span className="text-teal-400">from day one</span>
         </h1>
 
-        <p className="mt-6 mx-auto max-w-xl text-lg text-teal-100/70 leading-relaxed">
+        <p className="mt-6 mx-auto max-w-xl text-base sm:text-lg text-teal-100/70 leading-relaxed">
           The smartest way for English speakers to learn Vietnamese. Adaptive flashcards,
           AI conversation tutor, sentence drills — all in one beautiful app.
         </p>

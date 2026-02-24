@@ -16,6 +16,7 @@ import {
   Flame,
   GraduationCap,
 } from "lucide-react";
+import { X } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -35,7 +36,12 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/settings", label: "Settings", icon: <Settings size={18} /> },
 ];
 
-export function Sidebar() {
+interface SidebarProps {
+  mobileOpen?: boolean;
+  onClose?: () => void;
+}
+
+export function Sidebar({ mobileOpen, onClose }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
   const { user } = useAuth();
@@ -43,12 +49,17 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        "flex flex-col bg-white border-r border-slate-200 h-screen sticky top-0 transition-all duration-200 shrink-0",
-        collapsed ? "w-16" : "w-60"
+        "flex flex-col bg-white border-r border-slate-200 h-screen transition-all duration-200 shrink-0",
+        // Mobile: fixed off-screen drawer
+        "fixed inset-y-0 left-0 z-30",
+        mobileOpen ? "translate-x-0" : "-translate-x-full",
+        // Desktop: sticky in-flow, always visible, collapsible
+        "md:sticky md:top-0 md:z-auto md:translate-x-0",
+        collapsed ? "md:w-16 w-60" : "w-60"
       )}
     >
-      {/* Logo */}
-      <div className="flex h-16 items-center border-b border-slate-100 px-4">
+      {/* Logo + mobile close */}
+      <div className="flex h-16 items-center justify-between border-b border-slate-100 px-4">
         <Link href="/dashboard" className="flex items-center gap-2 overflow-hidden">
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-teal-600 text-white font-bold text-sm">
             V
@@ -59,6 +70,14 @@ export function Sidebar() {
             </span>
           )}
         </Link>
+        {/* Close button — mobile only */}
+        <button
+          onClick={onClose}
+          className="md:hidden ml-2 rounded-lg p-1.5 text-slate-400 hover:bg-slate-100"
+          aria-label="Close menu"
+        >
+          <X size={18} />
+        </button>
       </div>
 
       {/* Nav */}
@@ -69,6 +88,7 @@ export function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
+              onClick={onClose}
               className={cn(
                 "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-150",
                 active

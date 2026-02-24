@@ -1,15 +1,16 @@
 "use client";
 
-import { useState, FormEvent } from "react";
-import { User, Target, Bell, Shield, ChevronRight } from "lucide-react";
+import { useState, useEffect, FormEvent } from "react";
+import { User, Target, Bell, Shield, ChevronRight, CreditCard, Check, Zap, Lock } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils/cn";
 import type { VietnameseLevel, LearningGoal } from "@/types";
+
+type SectionId = "profile" | "goals" | "notifications" | "account" | "billing";
 
 const LEVELS: { value: VietnameseLevel; label: string }[] = [
   { value: "absolute_beginner", label: "Absolute Beginner" },
@@ -36,13 +37,33 @@ const SECTIONS = [
   { id: "goals", label: "Learning goals", icon: Target },
   { id: "notifications", label: "Notifications", icon: Bell },
   { id: "account", label: "Account", icon: Shield },
+  { id: "billing", label: "Billing", icon: CreditCard },
+];
+
+const FREE_FEATURES = [
+  "Up to 100 vocabulary cards",
+  "10 AI tutor messages / day",
+  "Basic quiz modes",
+  "5 lessons per month",
+  "Community support",
+];
+
+const PRO_FEATURES = [
+  "Unlimited vocabulary cards",
+  "Unlimited AI tutor messages",
+  "All quiz & listening modes",
+  "Unlimited AI-generated lessons",
+  "Pronunciation feedback",
+  "Offline mode",
+  "Priority support",
 ];
 
 export default function SettingsPage() {
-  const { user, refreshUser } = useAuth();
-  const [activeSection, setActiveSection] = useState("profile");
+  const { user, updateUser } = useAuth();
+  const [activeSection, setActiveSection] = useState<SectionId>("profile");
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   // Profile form state
   const [name, setName] = useState(user?.name ?? "");
@@ -52,6 +73,16 @@ export default function SettingsPage() {
   const [selectedLevel, setSelectedLevel] = useState<VietnameseLevel>(user?.level ?? "beginner");
   const [selectedGoals, setSelectedGoals] = useState<LearningGoal[]>(user?.goals ?? []);
   const [dailyGoal, setDailyGoal] = useState(user?.dailyGoalMinutes ?? 10);
+
+  // Sync form state when user data loads (async)
+  useEffect(() => {
+    if (!user) return;
+    setName(user.name);
+    setEmail(user.email);
+    setSelectedLevel(user.level);
+    setSelectedGoals(user.goals ?? []);
+    setDailyGoal(user.dailyGoalMinutes ?? 10);
+  }, [user?.id]);
 
   // Reminder state
   const [reminderEnabled, setReminderEnabled] = useState(true);
@@ -64,24 +95,60 @@ export default function SettingsPage() {
   const handleSave = async (e: FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
-    await new Promise((r) => setTimeout(r, 700)); // Mock save delay
-    setIsSaving(false);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    setSaveError(null);
+    try {
+      if (activeSection === "goals") {
+        await updateUser({
+          level: selectedLevel,
+          goals: selectedGoals,
+          dailyGoal,
+        });
+      }
+      // profile / notifications sections — extend here as backend adds support
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : "Failed to save");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
     <AppLayout title="Settings">
+      {/* ── Mobile: horizontal tab strip ── */}
+      <div className="flex gap-1 overflow-x-auto pb-1 mb-4 md:hidden">
+        {SECTIONS.map((s) => {
+          const Icon = s.icon;
+          return (
+            <button
+              key={s.id}
+              onClick={() => setActiveSection(s.id as SectionId)}
+              className={cn(
+                "flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-2 text-xs font-semibold transition-all shrink-0",
+                activeSection === s.id
+                  ? "bg-teal-600 text-white"
+                  : "bg-slate-100 text-slate-600"
+              )}
+            >
+              <Icon size={13} />
+              {s.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* ── Desktop: sidebar + content ── */}
       <div className="flex gap-6">
-        {/* Sidebar nav */}
-        <aside className="w-52 shrink-0">
+        {/* Sidebar nav — desktop only */}
+        <aside className="hidden md:block w-52 shrink-0">
           <nav className="space-y-1">
             {SECTIONS.map((s) => {
               const Icon = s.icon;
               return (
                 <button
                   key={s.id}
-                  onClick={() => setActiveSection(s.id)}
+                  onClick={() => setActiveSection(s.id as SectionId)}
                   className={cn(
                     "w-full flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium transition-all",
                     activeSection === s.id
@@ -99,7 +166,7 @@ export default function SettingsPage() {
         </aside>
 
         {/* Main content */}
-        <div className="flex-1 max-w-xl">
+        <div className="flex-1 min-w-0">
           {activeSection === "profile" && (
             <Card>
               <CardHeader>
@@ -133,6 +200,7 @@ export default function SettingsPage() {
                   <Button type="submit" isLoading={isSaving}>
                     {saved ? "✓ Saved!" : "Save changes"}
                   </Button>
+                  {saveError && <p className="text-sm text-red-500 mt-1">{saveError}</p>}
                 </form>
               </CardContent>
             </Card>
@@ -148,7 +216,7 @@ export default function SettingsPage() {
                 <form onSubmit={handleSave} className="space-y-6">
                   <div>
                     <p className="text-sm font-semibold text-slate-700 mb-3">My Vietnamese level</p>
-                    <div className="space-y-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {LEVELS.map((l) => (
                         <label
                           key={l.value}
@@ -200,7 +268,7 @@ export default function SettingsPage() {
 
                   <div>
                     <p className="text-sm font-semibold text-slate-700 mb-3">Daily study goal</p>
-                    <div className="flex gap-3">
+                    <div className="flex flex-wrap gap-2">
                       {DAILY_GOALS.map((mins) => (
                         <button
                           key={mins}
@@ -220,6 +288,7 @@ export default function SettingsPage() {
                   <Button type="submit" isLoading={isSaving}>
                     {saved ? "✓ Saved!" : "Save goals"}
                   </Button>
+                  {saveError && <p className="text-sm text-red-500 mt-1">{saveError}</p>}
                 </form>
               </CardContent>
             </Card>
@@ -270,6 +339,121 @@ export default function SettingsPage() {
                 </form>
               </CardContent>
             </Card>
+          )}
+
+          {activeSection === "billing" && (
+            <div className="space-y-5">
+              {/* Trial alert */}
+              <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3.5">
+                <Zap size={18} className="mt-0.5 shrink-0 text-amber-500" />
+                <div>
+                  <p className="text-sm font-semibold text-amber-800">You&apos;re currently in trial</p>
+                  <p className="text-sm text-amber-700 mt-0.5">
+                    All Pro features are <span className="font-semibold">free and unlimited</span> during the trial period. No credit card needed — enjoy everything without restrictions.
+                  </p>
+                </div>
+              </div>
+
+              {/* Current plan banner */}
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-600 border border-slate-200">
+                          Current plan
+                        </span>
+                      </div>
+                      <h3 className="text-2xl font-bold text-slate-800 mt-2">Free</h3>
+                      <p className="text-sm text-slate-500 mt-1">You&apos;re on the free tier — no credit card required.</p>
+                    </div>
+                    <div className="shrink-0 h-12 w-12 rounded-xl bg-slate-100 flex items-center justify-center">
+                      <CreditCard size={22} className="text-slate-400" />
+                    </div>
+                  </div>
+
+                  <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                    <div className="rounded-xl bg-slate-50 p-3 text-center">
+                      <p className="text-lg font-bold text-slate-800">100</p>
+                      <p className="text-xs text-slate-500 mt-0.5">Cards limit</p>
+                    </div>
+                    <div className="rounded-xl bg-slate-50 p-3 text-center">
+                      <p className="text-lg font-bold text-slate-800">10 / day</p>
+                      <p className="text-xs text-slate-500 mt-0.5">AI messages</p>
+                    </div>
+                    <div className="rounded-xl bg-slate-50 p-3 text-center">
+                      <p className="text-lg font-bold text-slate-800">5 / mo</p>
+                      <p className="text-xs text-slate-500 mt-0.5">Lessons</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Plan comparison */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Free column */}
+                <Card>
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-base">Free</CardTitle>
+                      <span className="rounded-full bg-teal-50 border border-teal-200 px-2.5 py-0.5 text-xs font-semibold text-teal-700">Current</span>
+                    </div>
+                    <p className="text-2xl font-bold text-slate-800 mt-1">$0 <span className="text-sm font-normal text-slate-400">/ month</span></p>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2">
+                      {FREE_FEATURES.map((f) => (
+                        <li key={f} className="flex items-start gap-2 text-sm text-slate-600">
+                          <Check size={15} className="mt-0.5 shrink-0 text-teal-500" />
+                          {f}
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+
+                {/* Pro column */}
+                <Card className="border-teal-300 bg-linear-to-br from-teal-50 to-white">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-base">Pro</CardTitle>
+                      <span className="inline-flex items-center gap-1 rounded-full bg-teal-600 px-2.5 py-0.5 text-xs font-semibold text-white">
+                        <Zap size={11} /> Recommended
+                      </span>
+                    </div>
+                    <p className="text-2xl font-bold text-slate-800 mt-1">$9 <span className="text-sm font-normal text-slate-400">/ month</span></p>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2 mb-5">
+                      {PRO_FEATURES.map((f) => (
+                        <li key={f} className="flex items-start gap-2 text-sm text-slate-600">
+                          <Check size={15} className="mt-0.5 shrink-0 text-teal-500" />
+                          {f}
+                        </li>
+                      ))}
+                    </ul>
+                    <Button className="w-full" disabled>
+                      <Lock size={13} className="mr-1.5" />
+                      Coming soon
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Billing history placeholder */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Billing history</CardTitle>
+                  <CardDescription>No invoices yet — you&apos;re on the free plan.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-6 py-8 text-center">
+                    <CreditCard size={28} className="mx-auto text-slate-300 mb-2" />
+                    <p className="text-sm text-slate-400">Invoices will appear here once you upgrade.</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           )}
 
           {activeSection === "account" && (

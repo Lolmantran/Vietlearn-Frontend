@@ -24,7 +24,7 @@ export function SessionList({
   isLoading,
 }: SessionListProps) {
   return (
-    <aside className="w-72 shrink-0 flex flex-col border-r border-slate-200 bg-white">
+    <aside className="w-full md:w-72 flex flex-col border-r border-slate-200 bg-white">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-4 border-b border-slate-100">
         <div className="flex items-center gap-2">
