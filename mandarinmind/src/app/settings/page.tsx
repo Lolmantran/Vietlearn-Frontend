@@ -97,9 +97,32 @@ export default function SettingsPage() {
 
   return (
     <AppLayout title="Settings">
+      {/* ── Mobile: horizontal tab strip ── */}
+      <div className="flex gap-1 overflow-x-auto pb-1 mb-4 md:hidden">
+        {SECTIONS.map((s) => {
+          const Icon = s.icon;
+          return (
+            <button
+              key={s.id}
+              onClick={() => setActiveSection(s.id as SectionId)}
+              className={cn(
+                "flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-2 text-xs font-semibold transition-all shrink-0",
+                activeSection === s.id
+                  ? "bg-teal-600 text-white"
+                  : "bg-slate-100 text-slate-600"
+              )}
+            >
+              <Icon size={13} />
+              {s.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* ── Desktop: sidebar + content ── */}
       <div className="flex gap-6">
-        {/* Sidebar nav */}
-        <aside className="w-52 shrink-0">
+        {/* Sidebar nav — desktop only */}
+        <aside className="hidden md:block w-52 shrink-0">
           <nav className="space-y-1">
             {SECTIONS.map((s) => {
               const Icon = s.icon;
@@ -124,7 +147,7 @@ export default function SettingsPage() {
         </aside>
 
         {/* Main content */}
-        <div className="flex-1 max-w-xl">
+        <div className="flex-1 min-w-0">
           {activeSection === "profile" && (
             <Card>
               <CardHeader>
@@ -164,7 +187,6 @@ export default function SettingsPage() {
             </Card>
           )}
 
-          {/* ── Learning goals ── */}
           {activeSection === "goals" && (
             <Card>
               <CardHeader>
@@ -175,7 +197,7 @@ export default function SettingsPage() {
                 <form onSubmit={handleSave} className="space-y-6">
                   <div>
                     <p className="text-sm font-semibold text-slate-700 mb-3">My Vietnamese level</p>
-                    <div className="space-y-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {LEVELS.map((l) => (
                         <label
                           key={l.value}
@@ -227,7 +249,7 @@ export default function SettingsPage() {
 
                   <div>
                     <p className="text-sm font-semibold text-slate-700 mb-3">Daily study goal</p>
-                    <div className="flex gap-3">
+                    <div className="flex flex-wrap gap-2">
                       {DAILY_GOALS.map((mins) => (
                         <button
                           key={mins}

@@ -9,8 +9,8 @@ const LINKS = {
 export function LandingFooter() {
   return (
     <footer className="bg-teal-950 text-teal-100/60 py-16">
-      <div className="mx-auto max-w-6xl px-6">
-        <div className="grid gap-10 md:grid-cols-4">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-4">
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2 mb-4">

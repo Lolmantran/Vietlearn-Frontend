@@ -3,6 +3,7 @@ import type {
   VocabCard,
   Deck,
   DeckType,
+  DeckProgress,
   ReviewPayload,
   ReviewResponse,
   EnrollResponse,
@@ -103,6 +104,25 @@ export const vocabApi = {
       alreadyEnrolled: raw?.alreadyEnrolled ?? 0,
       total: raw?.total ?? 0,
     };
+  },
+
+  // GET /vocab/progress — per-deck progress for the current user
+  getDeckProgress: async (): Promise<DeckProgress[]> => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const raw = await apiClient.get<any[]>("/vocab/progress");
+    const arr = Array.isArray(raw) ? raw : [];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return arr.map((d: any): DeckProgress => ({
+      id: d?.id ?? "",
+      name: d?.name ?? "Deck",
+      description: d?.description ?? null,
+      icon: d?.icon ?? DECK_EMOJI[(d?.deckType ?? "").toLowerCase()] ?? "📖",
+      cardCount: d?.cardCount ?? 0,
+      enrolledCount: d?.enrolledCount ?? 0,
+      masteredCount: d?.masteredCount ?? 0,
+      progress: d?.progress ?? 0,
+      lastStudiedAt: d?.lastStudiedAt ?? new Date().toISOString(),
+    }));
   },
 
   // POST /vocab/review — backend expects { flashcardId, rating (lowercase) }

@@ -35,20 +35,20 @@ export function HeroSection() {
         </div>
       </div>
 
-      <div className="relative mx-auto max-w-6xl px-6 py-24 text-center">
+      <div className="relative mx-auto max-w-6xl px-4 sm:px-6 py-16 sm:py-20 md:py-28 text-center">
         {/* Badge */}
         <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-teal-500/30 bg-teal-500/10 px-4 py-1.5 text-sm text-teal-300">
           <Sparkles size={14} />
           AI-powered · Spaced repetition · Free to start
         </div>
 
-        <h1 className="text-5xl md:text-7xl font-black text-white leading-tight tracking-tight">
+        <h1 className="text-4xl sm:text-5xl md:text-7xl font-black text-white leading-tight tracking-tight">
           Speak Vietnamese
           <br />
           <span className="text-teal-400">from day one</span>
         </h1>
 
-        <p className="mt-6 mx-auto max-w-xl text-lg text-teal-100/70 leading-relaxed">
+        <p className="mt-6 mx-auto max-w-xl text-base sm:text-lg text-teal-100/70 leading-relaxed">
           The smartest way for English speakers to learn Vietnamese. Adaptive flashcards,
           AI conversation tutor, sentence drills — all in one beautiful app.
         </p>

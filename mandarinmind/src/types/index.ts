@@ -8,6 +8,7 @@ export interface User {
   level: VietnameseLevel;
   goals: LearningGoal[];
   dailyGoalMinutes: number;
+  minutesStudiedToday: number;
   streakDays: number;
   totalWordsLearned: number;
   createdAt: string;
@@ -134,6 +135,18 @@ export interface EnrollResponse {
   enrolled: number;
   alreadyEnrolled: number;
   total: number;
+}
+
+export interface DeckProgress {
+  id: string;
+  name: string;
+  description: string | null;
+  icon: string;           // emoji e.g. "📚"
+  cardCount: number;
+  enrolledCount: number;
+  masteredCount: number;
+  progress: number;       // 0–100
+  lastStudiedAt: string;  // ISO date
 }
 
 export interface CustomDeckPayload {
@@ -286,8 +299,8 @@ export interface StatsOverview {
 export interface DayActivity {
   date: string;
   minutesStudied: number;
-  wordsReviewed: number;
-  xpEarned: number;
+  wordsReviewed?: number;
+  xpEarned?: number;
 }
 
 export interface RecommendedAction {

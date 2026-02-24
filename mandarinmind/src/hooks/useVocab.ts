@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { vocabApi } from "@/lib/api/vocabApi";
-import type { VocabCard, Deck, SRSRating } from "@/types";
+import type { VocabCard, Deck, DeckProgress, SRSRating } from "@/types";
 
 export function useReviewQueue() {
   const [cards, setCards] = useState<VocabCard[]>([]);
@@ -43,6 +43,22 @@ export function useReviewQueue() {
     sessionComplete,
     submitRating,
   };
+}
+
+export function useDeckProgress() {
+  const [progress, setProgress] = useState<DeckProgress[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    vocabApi
+      .getDeckProgress()
+      .then(setProgress)
+      .catch((e: Error) => setError(e.message))
+      .finally(() => setIsLoading(false));
+  }, []);
+
+  return { progress, isLoading, error };
 }
 
 export function useDecks() {

@@ -37,7 +37,8 @@ function normalizeMessage(raw: any): TutorMessage {
 
   return {
     id: raw?.id ?? `msg-${Date.now()}-${Math.random()}`,
-    role: raw?.role === "user" ? "user" : "assistant",
+    // Backend returns "USER" or "ASSISTANT" (uppercase) — normalise to lowercase
+    role: (raw?.role ?? "").toString().toLowerCase() === "user" ? "user" : "assistant",
     text: raw?.text ?? raw?.content ?? raw?.message ?? "",
     corrections: corrections.length ? corrections : undefined,
     suggestions: Array.isArray(raw?.suggestions) ? raw.suggestions : undefined,

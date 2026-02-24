@@ -1,6 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import {
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
+} from "recharts";
 import { Flame, BookOpen, Brain, MessageSquare, Sparkles, ArrowRight, Calendar, Target } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { StatCard } from "@/components/ui/Card";
@@ -10,8 +13,10 @@ import { Badge } from "@/components/ui/Badge";
 import { Progress } from "@/components/ui/Progress";
 import { useStats } from "@/hooks/useStats";
 import { useAuth } from "@/hooks/useAuth";
+import { useDeckProgress } from "@/hooks/useVocab";
 import { formatLevel } from "@/lib/utils/format";
 import { cn } from "@/lib/utils/cn";
+import type { DayActivity } from "@/types";
 
 // ─── Mock data shown when backend not available ───────────────────────────────
 const MOCK_OVERVIEW = {
@@ -24,8 +29,6 @@ const MOCK_OVERVIEW = {
   weeklyActivity: Array.from({ length: 7 }, (_, i) => ({
     date: new Date(Date.now() - (6 - i) * 86400000).toISOString(),
     minutesStudied: [0, 15, 8, 22, 5, 18, 12][i],
-    wordsReviewed: [0, 30, 16, 45, 10, 35, 23][i],
-    xpEarned: [0, 100, 60, 180, 40, 130, 90][i],
   })),
   nextRecommendedAction: {
     type: "review" as const,
@@ -71,24 +74,92 @@ const QUICK_ACTIONS = [
   },
 ];
 
-function WeeklyActivity({ activity }: { activity: typeof MOCK_OVERVIEW.weeklyActivity }) {
-  const max = Math.max(...activity.map((d) => d.minutesStudied), 1);
-  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+// ─── Recharts weekly bar chart ───────────────────────────────────────────────
+const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+function formatDayLabel(dateStr: string): string {
+  const d = new Date(dateStr);
+  return isNaN(d.getTime()) ? "" : DAY_LABELS[d.getDay()];
+}
+
+interface TooltipPayload { date: string; minutesStudied: number }
+function CustomTooltip({ active, payload }: { active?: boolean; payload?: { payload: TooltipPayload }[] }) {
+  if (!active || !payload?.length) return null;
+  const { date, minutesStudied } = payload[0].payload;
   return (
-    <div className="flex items-end justify-between gap-2 h-20">
-      {activity.map((day, i) => (
-        <div key={i} className="flex flex-col items-center gap-1 flex-1">
-          <div
-            className={cn(
-              "w-full rounded-lg transition-all",
-              day.minutesStudied > 0 ? "bg-teal-500" : "bg-slate-100"
-            )}
-            style={{ height: `${(day.minutesStudied / max) * 100}%`, minHeight: "4px" }}
-            title={`${day.minutesStudied} min`}
+    <div className="rounded-lg bg-slate-800 px-2.5 py-1.5 text-xs text-white shadow-lg">
+      {formatDayLabel(date)} · {minutesStudied} min
+    </div>
+  );
+}
+
+function WeeklyActivityChart({ activity, todayMinutes }: { activity: DayActivity[]; todayMinutes: number }) {
+  const yMax = Math.max(Math.max(...activity.map((d) => d.minutesStudied), 0), 30);
+  const todayStr = new Date().toISOString().slice(0, 10);
+
+  const data = activity.map((d) => ({
+    date: d.date,
+    label: formatDayLabel(d.date),
+    minutesStudied: d.minutesStudied,
+    display: d.minutesStudied === 0 ? 0.4 : d.minutesStudied,
+    isToday: d.date.slice(0, 10) === todayStr,
+  }));
+
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-5">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-sm font-semibold text-slate-700">Weekly activity</h3>
+        <span className="text-xs text-slate-400">{todayMinutes} min today</span>
+      </div>
+      <ResponsiveContainer width="100%" height={100}>
+        <BarChart data={data} barCategoryGap="20%" margin={{ top: 4, right: 0, left: -32, bottom: 0 }}>
+          <XAxis
+            dataKey="label"
+            tick={{ fontSize: 11, fill: "#94a3b8" }}
+            axisLine={false}
+            tickLine={false}
           />
-          <span className="text-xs text-slate-400">{days[i]}</span>
-        </div>
-      ))}
+          <YAxis
+            domain={[0, yMax]}
+            tick={{ fontSize: 10, fill: "#cbd5e1" }}
+            axisLine={false}
+            tickLine={false}
+            tickCount={3}
+          />
+          <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(0,0,0,0.04)" }} />
+          <Bar dataKey="display" radius={[4, 4, 0, 0]} minPointSize={3}>
+            {data.map((entry, i) => (
+              <Cell
+                key={i}
+                fill={entry.isToday ? "#0d9488" : entry.minutesStudied === 0 ? "#e2e8f0" : "#99f6e4"}
+              />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+// ─── Daily goal card ─────────────────────────────────────────────────────────
+function DailyGoalCard({ minutesToday, dailyGoal }: { minutesToday: number; dailyGoal: number }) {
+  const pct = Math.min(Math.round((minutesToday / Math.max(dailyGoal, 1)) * 100), 100);
+  const completed = minutesToday >= dailyGoal;
+  const started = minutesToday > 0;
+
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-5">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-sm font-semibold text-slate-700">Daily goal</h3>
+        <Badge variant={completed ? "success" : started ? "amber" : "default"}>
+          {completed ? "Completed ✓" : started ? "In progress" : "Not started"}
+        </Badge>
+      </div>
+      <div className="flex justify-between text-xs text-slate-500 mb-1.5">
+        <span>{minutesToday} / {dailyGoal} min</span>
+        <span>{pct}%</span>
+      </div>
+      <Progress value={minutesToday} max={dailyGoal} color="teal" />
     </div>
   );
 }
@@ -96,8 +167,12 @@ function WeeklyActivity({ activity }: { activity: typeof MOCK_OVERVIEW.weeklyAct
 export default function DashboardPage() {
   const { user } = useAuth();
   const { overview, isLoading } = useStats();
+  const { progress: deckProgress, isLoading: progressLoading } = useDeckProgress();
 
   const data = overview ?? MOCK_OVERVIEW;
+  const minutesToday = user?.minutesStudiedToday ?? data?.minutesStudiedToday ?? 0;
+  const dailyGoal = user?.dailyGoalMinutes ?? 20;
+  const totalWordsLearned = user?.totalWordsLearned ?? data?.totalWordsLearned ?? 0;
 
   return (
     <AppLayout title="Dashboard">
@@ -131,7 +206,7 @@ export default function DashboardPage() {
               },
               {
                 label: "Words learned",
-                value: (data?.totalWordsLearned ?? 0).toLocaleString(),
+                value: totalWordsLearned.toLocaleString(),
                 sub: "Total vocabulary",
                 icon: <BookOpen size={18} />,
                 colorClass: "bg-teal-50 text-teal-600",
@@ -199,53 +274,63 @@ export default function DashboardPage() {
 
         {/* Right column */}
         <div className="space-y-5">
-          {/* Weekly activity */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-slate-700">Weekly activity</h3>
-              <span className="text-xs text-slate-400">{data?.minutesStudiedToday ?? 0} min today</span>
+          {/* Weekly activity chart */}
+          {isLoading ? (
+            <div className="rounded-2xl border border-slate-200 bg-white p-5">
+              <Skeleton className="h-4 w-32 mb-4" />
+              <Skeleton className="h-24 w-full" />
             </div>
-            {isLoading ? (
-              <Skeleton className="h-20 w-full" />
-            ) : (
-              <WeeklyActivity activity={data?.weeklyActivity ?? []} />
-            )}
-          </div>
+          ) : (
+            <WeeklyActivityChart
+              activity={data?.weeklyActivity ?? []}
+              todayMinutes={minutesToday}
+            />
+          )}
 
           {/* Daily goal */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold text-slate-700">Daily goal</h3>
-              <Badge variant={(data?.minutesStudiedToday ?? 0) >= (user?.dailyGoalMinutes ?? 10) ? "success" : "default"}>
-                {(data?.minutesStudiedToday ?? 0) >= (user?.dailyGoalMinutes ?? 10) ? "Complete ✓" : "In progress"}
-              </Badge>
+          {isLoading ? (
+            <div className="rounded-2xl border border-slate-200 bg-white p-5">
+              <Skeleton className="h-4 w-24 mb-3" />
+              <Skeleton className="h-3 w-full" />
             </div>
-            <Progress
-              value={data?.minutesStudiedToday ?? 0}
-              max={user?.dailyGoalMinutes ?? 10}
-              color="teal"
-              label={`${data?.minutesStudiedToday ?? 0} / ${user?.dailyGoalMinutes ?? 10} min`}
-              showLabel
-            />
-          </div>
+          ) : (
+            <DailyGoalCard minutesToday={minutesToday} dailyGoal={dailyGoal} />
+          )}
 
           {/* Continue learning */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
-            <h3 className="text-sm font-semibold text-slate-700 mb-3">Continue where you left off</h3>
-            {[
-              { title: "Core Vocabulary", progress: 65, icon: "📚" },
-              { title: "Travel Phrases", progress: 30, icon: "✈️" },
-            ].map((item) => (
-              <div key={item.title} className="mb-3 last:mb-0">
-                <div className="flex items-center gap-2 mb-1.5">
-                  <span>{item.icon}</span>
-                  <span className="text-sm font-medium text-slate-700 flex-1">{item.title}</span>
-                  <span className="text-xs text-slate-400">{item.progress}%</span>
-                </div>
-                <Progress value={item.progress} size="sm" color="teal" />
-              </div>
-            ))}
-          </div>
+          {progressLoading ? (
+            <div className="rounded-2xl border border-slate-200 bg-white p-5">
+              <Skeleton className="h-4 w-40 mb-4" />
+              <Skeleton className="h-10 w-full mb-3" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+          ) : deckProgress.length === 0 ? (
+            <div className="rounded-2xl border border-slate-200 bg-white p-5">
+              <h3 className="text-sm font-semibold text-slate-700 mb-2">Continue where you left off</h3>
+              <p className="text-xs text-slate-400 mb-3">You haven&apos;t studied any decks yet.</p>
+              <Link href="/learn/vocab">
+                <Button variant="outline" size="sm" rightIcon={<ArrowRight size={14} />}>
+                  Enroll in a deck to get started
+                </Button>
+              </Link>
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-slate-200 bg-white p-5">
+              <h3 className="text-sm font-semibold text-slate-700 mb-3">Continue where you left off</h3>
+              {deckProgress.slice(0, 3).map((item) => (
+                <Link key={item.id} href={`/learn/vocab?deck=${item.id}`}>
+                  <div className="mb-3 last:mb-0 group cursor-pointer">
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <span>{item.icon}</span>
+                      <span className="text-sm font-medium text-slate-700 flex-1 group-hover:text-teal-600 transition-colors">{item.name}</span>
+                      <span className="text-xs text-slate-400">{item.progress}%</span>
+                    </div>
+                    <Progress value={item.progress} size="sm" color="teal" />
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </AppLayout>

@@ -36,6 +36,7 @@ export function normalizeUser(raw: any): User {
     level,
     goals,
     dailyGoalMinutes: raw?.dailyGoal ?? raw?.dailyGoalMinutes ?? 10,
+    minutesStudiedToday: raw?.minutesStudiedToday ?? 0,
     streakDays: raw?.currentStreak ?? raw?.streakDays ?? 0,
     totalWordsLearned: raw?.totalWords ?? raw?.totalWordsLearned ?? 0,
     createdAt: raw?.createdAt ?? new Date().toISOString(),
@@ -71,15 +72,15 @@ function goalToBackend(goal: LearningGoal): string {
 
 export const authApi = {
   login: async (credentials: AuthCredentials): Promise<AuthResponse> => {
-    const res = await apiClient.post<AuthResponse>("/auth/login", credentials);
+    const res = await apiClient.post<{ accessToken: string; user: unknown }>("/auth/login", credentials);
     setToken(res.accessToken);
-    return res;
+    return { accessToken: res.accessToken, user: normalizeUser(res.user) };
   },
 
   register: async (payload: RegisterPayload): Promise<AuthResponse> => {
-    const res = await apiClient.post<AuthResponse>("/auth/register", payload);
+    const res = await apiClient.post<{ accessToken: string; user: unknown }>("/auth/register", payload);
     setToken(res.accessToken);
-    return res;
+    return { accessToken: res.accessToken, user: normalizeUser(res.user) };
   },
 
   getMe: async (): Promise<User> => {

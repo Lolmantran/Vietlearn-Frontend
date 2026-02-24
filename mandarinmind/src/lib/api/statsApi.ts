@@ -23,7 +23,15 @@ function normalizeOverview(raw: any): StatsOverview {
     xpToday: raw?.xpToday ?? 0,
     xpTotal: raw?.xpTotal ?? Math.round(totalQuizzes * avgScore),
     minutesStudiedToday: raw?.minutesStudiedToday ?? 0,
-    weeklyActivity: Array.isArray(raw?.weeklyActivity) ? raw.weeklyActivity : [],
+    weeklyActivity: Array.isArray(raw?.weeklyActivity)
+      ? raw.weeklyActivity.map((d: any) => ({
+          date: d?.date ?? new Date().toISOString(),
+          // Backend sends { date, minutes } — normalise to { date, minutesStudied }
+          minutesStudied: d?.minutesStudied ?? d?.minutes ?? 0,
+          wordsReviewed: d?.wordsReviewed ?? 0,
+          xpEarned: d?.xpEarned ?? 0,
+        }))
+      : [],
     nextRecommendedAction: raw?.nextRecommendedAction ?? {
       type: "quiz",
       title: "Take today's quiz",

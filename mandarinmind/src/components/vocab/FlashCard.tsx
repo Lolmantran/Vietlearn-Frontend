@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Volume2, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import type { VocabCard } from "@/types";
-import { Badge } from "@/components/ui/Badge";
+import { PosBadge } from "./PosBadge";
 
 interface FlashCardProps {
   card: VocabCard;
@@ -56,7 +56,6 @@ export function FlashCard({ card, onFlip }: FlashCardProps) {
       >
         {/* Front */}
         <div className="backface-hidden absolute inset-0 flex flex-col items-center justify-center rounded-3xl bg-white border-2 border-slate-200 shadow-lg p-8">
-          <Badge variant="teal" className="mb-4">{card.partOfSpeech}</Badge>
           <h2 className="text-4xl font-black text-slate-900 text-center">{card.english}</h2>
           <p className="mt-4 text-sm text-slate-400">Tap or press Space to reveal Vietnamese</p>
           <div className="absolute top-4 right-4 flex items-center gap-1 text-slate-300 text-xs">
@@ -68,6 +67,7 @@ export function FlashCard({ card, onFlip }: FlashCardProps) {
         {/* Back */}
         <div className="backface-hidden rotate-y-180 absolute inset-0 flex flex-col items-center justify-center rounded-3xl bg-linear-to-br from-teal-600 to-teal-700 shadow-lg p-8 text-white">
           <h2 className="text-4xl font-black text-center mb-1">{card.vietnamese}</h2>
+          <PosBadge pos={card.partOfSpeech} variant="dark" className="mb-2" />
           <p className="text-teal-200 text-lg font-medium">{card.toneMarks}</p>
           <p className="text-teal-100/80 text-sm mt-1">[{card.pronunciation}]</p>
 
