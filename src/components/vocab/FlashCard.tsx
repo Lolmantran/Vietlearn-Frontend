@@ -15,6 +15,7 @@ export function FlashCard({ card, onFlip }: FlashCardProps) {
   const [flipped, setFlipped] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setFlipped(false);
   }, [card.id]);
 

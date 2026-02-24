@@ -24,7 +24,7 @@ function normalizeOverview(raw: any): StatsOverview {
     xpTotal: raw?.xpTotal ?? Math.round(totalQuizzes * avgScore),
     minutesStudiedToday: raw?.minutesStudiedToday ?? 0,
     weeklyActivity: Array.isArray(raw?.weeklyActivity)
-      ? raw.weeklyActivity.map((d: any) => ({
+      ? raw.weeklyActivity.map((d: Record<string, unknown>) => ({
           date: d?.date ?? new Date().toISOString(),
           // Backend sends { date, minutes } — normalise to { date, minutesStudied }
           minutesStudied: d?.minutesStudied ?? d?.minutes ?? 0,

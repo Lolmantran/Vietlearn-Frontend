@@ -9,7 +9,6 @@ import {
   MessageSquare,
   Brain,
   Sparkles,
-  BarChart2,
   Settings,
   ChevronLeft,
   ChevronRight,

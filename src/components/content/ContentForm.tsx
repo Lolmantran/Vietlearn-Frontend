@@ -5,7 +5,7 @@ import { Sparkles, FileText, Tag } from "lucide-react";
 import { Tabs } from "@/components/ui/Tabs";
 import { Button } from "@/components/ui/Button";
 import { Textarea } from "@/components/ui/Input";
-import { Badge } from "@/components/ui/Badge";
+
 import type { VietnameseLevel } from "@/types";
 
 const TOPIC_SUGGESTIONS = [
